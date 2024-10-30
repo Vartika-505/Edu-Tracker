@@ -1,0 +1,15 @@
+# Ignore node_modules for backend and edutracker-ui
+backend/node_modules/
+edutracker-ui/node_modules/
+
+# Ignore environment variables
+.env
+
+# Ignore other node_modules
+node_modules/
+
+# Ignore log files
+*.log
+
+# Ignore package-lock.json files
+package-lock.json
