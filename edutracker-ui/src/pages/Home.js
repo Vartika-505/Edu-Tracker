@@ -8,6 +8,7 @@ const Home = ({ token }) => {
       <Navbar />
 
       {/* Header */}
+      
       <header className="text-center mb-10 mt-20">
         <img src="/logo.png" alt="EduTracker Logo" className="w-20 h-20 mx-auto mb-4 rounded-full shadow-md" />
         <h1 className="text-5xl font-extrabold text-blue-800">Welcome to EduTracker</h1>
