@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 
-const Login = ({ setToken, setUsername, handleLogout }) => {
+const Login = ({ setToken, setUsername, handleLogout, setAuraPoints }) => {
     const [usernameInput, setUsernameInput] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
@@ -13,11 +13,14 @@ const Login = ({ setToken, setUsername, handleLogout }) => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         const localUsername = localStorage.getItem('username'); // Get username from local storage
+        const storedAuraPoints = localStorage.getItem('auraPoints');
+
         if (token) {
             setIsLoggedIn(true);
             setUsername(localUsername); // Set username state
+            setAuraPoints(Number(storedAuraPoints));
         }
-    }, [navigate, setUsername]);
+    }, [navigate, setUsername,setAuraPoints]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,11 +30,16 @@ const Login = ({ setToken, setUsername, handleLogout }) => {
                 password,
             });
 
-            const token = response.data.token; 
+            const { token, auraPoints } = response.data;
+
             localStorage.setItem('token', token); // Save token
             localStorage.setItem('username', usernameInput); // Save username
+            localStorage.setItem('auraPoints', auraPoints);
+
             setToken(token); // Set the token in the parent component
             setUsername(usernameInput); // Set the username in the parent component
+            setAuraPoints(auraPoints);
+            
             setMessage(`Login successful!`); // Show success message
             setUsernameInput('');
             setPassword('');

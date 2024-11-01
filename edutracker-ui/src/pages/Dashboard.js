@@ -4,7 +4,7 @@ import Navbar from './Navbar'; // Ensure Navbar is imported
 import Home from './Home';
 import { useNavigate } from 'react-router-dom';
 import logo11 from '../logo11.png';
-const Dashboard = ({token, username, handleLogout }) => {
+const Dashboard = ({token, username,auraPoints, handleLogout }) => {
     const navigate=useNavigate();
     return (
     !token?(
@@ -23,6 +23,7 @@ const Dashboard = ({token, username, handleLogout }) => {
             {/* Add more dashboard content here */}
             <main className="bg-gradient-to-r from-blue-300 to-green-300 shadow-lg rounded-lg p-8 w-full max-w-md text-center">
                 <h2 className="text-3xl font-semibold text-white mb-6">Your Learning Progress</h2>
+                <p className="text-xl text-white">Aura Points: <span className="font-bold">{auraPoints}</span></p>
                 <p>Dashboard features will be displayed here.</p>
                 {/* Logout button */}
             </main>

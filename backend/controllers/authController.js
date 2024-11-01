@@ -12,7 +12,7 @@ export const registerUser = async (req, res) => {
         if (existingEmail) return res.status(400).json({ message: "Email already exists" });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword }); // Add email to the new user
+        const newUser = new User({ username, email, password: hashedPassword,auraPoints: 0  }); // Add email to the new user
         await newUser.save();
 
         res.status(201).json({ message: 'User registered successfully!' });
@@ -31,7 +31,7 @@ export const loginUser = async (req, res) => {
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).json({ token });
+        res.status(200).json({ token,auraPoints: user.auraPoints });
     } catch (error) {
         res.status(500).json({ message: 'Error logging in', error });
     }
