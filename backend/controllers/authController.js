@@ -1,16 +1,18 @@
-// controllers/authController.js
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export const registerUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body; // Include email in the request body
     try {
         const existingUser = await User.findOne({ username });
-        if (existingUser) return res.status(400).json({ message: "User already exists" });
+        if (existingUser) return res.status(400).json({ message: "Username already exists" });
+
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) return res.status(400).json({ message: "Email already exists" });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, password: hashedPassword });
+        const newUser = new User({ username, email, password: hashedPassword }); // Add email to the new user
         await newUser.save();
 
         res.status(201).json({ message: 'User registered successfully!' });
