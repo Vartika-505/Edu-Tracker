@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';       // Import database connection
 import authRoutes from './routes/authRoutes.js'; // Import auth routes
+import taskRoutes from './routes/tasks.js';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ connectDB().then(() => {
 
 // Routes
 app.use('/api/auth', authRoutes); // Use the auth routes for signup/login
+app.use('/api/tasks', taskRoutes);
 
 // Test route (optional)
 app.get('/', (req, res) => {

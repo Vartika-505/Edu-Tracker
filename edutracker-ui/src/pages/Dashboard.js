@@ -4,7 +4,10 @@ import Navbar from './Navbar'; // Ensure Navbar is imported
 import Home from './Home';
 import { useNavigate } from 'react-router-dom';
 import logo11 from '../logo11.png';
-const Dashboard = ({token, username,auraPoints, handleLogout }) => {
+import TaskManager from '../components/TaskManager';
+
+
+const Dashboard = ({token, username,auraPoints,setAuraPoints, handleLogout }) => {
     const navigate=useNavigate();
     return (
     !token?(
@@ -27,6 +30,11 @@ const Dashboard = ({token, username,auraPoints, handleLogout }) => {
                 <p>Dashboard features will be displayed here.</p>
                 {/* Logout button */}
             </main>
+
+            <section className="w-full max-w-2xl p-6 bg-gray-100 rounded-lg shadow-md">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">Manage Your Tasks</h3>
+                <TaskManager username={username} setAuraPoints={setAuraPoints} />
+            </section>
         </div> )
     );
 
