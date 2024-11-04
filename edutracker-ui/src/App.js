@@ -27,7 +27,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/home" element={<Home token={token} username={username} auraPoints={auraPoints} handleLogout={handleLogout} />} />
-        <Route path="/dashboard" element={<Dashboard token={token} username={username} auraPoints={auraPoints} handleLogout={handleLogout} />} />
+        <Route path="/dashboard" element={<Dashboard token={token} username={username} auraPoints={auraPoints} setAuraPoints={setAuraPoints} handleLogout={handleLogout} />} />
         <Route exact path="/login" element={<Login setToken={setToken} setUsername={setUsername} setAuraPoints={setAuraPoints} handleLogout={handleLogout} />} />
         <Route path="/" element={<Home token={token} username={username} />} />
         <Route path="/timetable" element={<Timetable />} />

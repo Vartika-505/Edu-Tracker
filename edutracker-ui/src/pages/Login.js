@@ -30,16 +30,19 @@ const Login = ({ setToken, setUsername, handleLogout, setAuraPoints }) => {
                 password,
             });
 
-            const { token, auraPoints } = response.data;
+            console.log("Login response data:", response.data);
 
+            const { token, auraPoints, userId } = response.data;
+
+            localStorage.setItem('userId', userId); // Save username
             localStorage.setItem('token', token); // Save token
-            localStorage.setItem('username', usernameInput); // Save username
+            localStorage.setItem('userId', response.data.userId);
             localStorage.setItem('auraPoints', auraPoints);
 
             setToken(token); // Set the token in the parent component
             setUsername(usernameInput); // Set the username in the parent component
             setAuraPoints(auraPoints);
-            
+
             setMessage(`Login successful!`); // Show success message
             setUsernameInput('');
             setPassword('');

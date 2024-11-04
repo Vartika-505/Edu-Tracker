@@ -19,7 +19,7 @@ const Navbar = ({ token, handleLogout }) => {
                         <>
                             <li><Link to="/dashboard" className="hover:text-gray-300">Dashboard</Link></li>
                             <li><Link to="/timetable" className="hover:text-gray-300">Timetable</Link></li>
-                            <li><Link to="/add-new" className="hover:text-gray-300">Add New</Link></li>
+                            <li><Link to="/tasks" className="hover:text-gray-300">Tasks</Link></li>
                             <li><Link to="/profile" className="hover:text-gray-300">Profile</Link></li>
                         </>
                     )}
