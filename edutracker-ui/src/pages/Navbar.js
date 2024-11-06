@@ -3,24 +3,98 @@ import { Link } from 'react-router-dom';
 import logo from '../logo.png';
 
 const Navbar = ({ token, handleLogout }) => {
+    const currentPath = window.location.pathname;
+
     return (
-        <nav className="bg-[#2e2e2e] text-white flex items-center px-6 py-4 fixed top-0 justify-between w-screen z-10 shadow-md">
+        <nav className="flex items-center px-6 py-4 fixed top-0 justify-between w-screen z-10 bg-white">
             <img src={logo} alt="EduTracker Logo" width="100px" />
-            <div className="flex justify-center items-center">
-                <ul className="flex gap-5 mr-10">
+            <div className="flex justify-center items-center h-full absolute right-0 m-[1vw]">
+                <ul className="flex gap-5 mr-10 h-full">
                     {!token ? (
                         <>
-                            <li><Link to="/home" className="hover:text-gray-300">Home</Link></li>
-                            <li><Link to="/about" className="hover:text-gray-300">About</Link></li>
-                            <li><Link to="/services" className="hover:text-gray-300">Services</Link></li>
-                            <li><Link to="/contact" className="hover:text-gray-300">Contact</Link></li>
+                            <li className="h-full">
+                                <Link
+                                    to="/home"
+                                    className={`flex items-center h-full px-4 py-2 ${
+                                        currentPath === '/home' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                    }`}
+                                >
+                                    Home
+                                </Link>
+                            </li>
+                            <li className="h-full">
+                                <Link
+                                    to="/about"
+                                    className={`flex items-center h-full px-4 py-2 ${
+                                        currentPath === '/about' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                    }`}
+                                >
+                                    About
+                                </Link>
+                            </li>
+                            <li className="h-full">
+                                <Link
+                                    to="/services"
+                                    className={`flex items-center h-full px-4 py-2 ${
+                                        currentPath === '/services' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                    }`}
+                                >
+                                    Services
+                                </Link>
+                            </li>
+                            <li className="h-full">
+                                <Link
+                                    to="/contact"
+                                    className={`flex items-center h-full px-4 py-2 ${
+                                        currentPath === '/contact' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                    }`}
+                                >
+                                    Contact
+                                </Link>
+                            </li>
                         </>
                     ) : (
                         <>
-                            <li><Link to="/dashboard" className="hover:text-gray-300">Dashboard</Link></li>
-                            <li><Link to="/timetable" className="hover:text-gray-300">Timetable</Link></li>
-                            <li><Link to="/tasks" className="hover:text-gray-300">Tasks</Link></li>
-                            <li><Link to="/profile" className="hover:text-gray-300">Profile</Link></li>
+                            <li className="h-full">
+                                <Link
+                                    to="/dashboard"
+                                    className={`flex items-center h-full px-4 py-2 ${
+                                        currentPath === '/dashboard' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                    }`}
+                                >
+                                    Dashboard
+                                </Link>
+                            </li>
+                            <li className="h-full">
+                                <Link
+                                    to="/timetable"
+                                    className={`flex items-center h-full px-4 py-2 ${
+                                        currentPath === '/timetable' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                    }`}
+                                >
+                                    Timetable
+                                </Link>
+                            </li>
+                            <li className="h-full">
+                                <Link
+                                    to="/tasks"
+                                    className={`flex items-center h-full px-4 py-2 ${
+                                        currentPath === '/tasks' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                    }`}
+                                >
+                                    Tasks
+                                </Link>
+                            </li>
+                            <li className="h-full">
+                                <Link
+                                    to="/profile"
+                                    className={`flex items-center h-full px-4 py-2 ${
+                                        currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                    }`}
+                                >
+                                    Profile
+                                </Link>
+                            </li>
                         </>
                     )}
                 </ul>
