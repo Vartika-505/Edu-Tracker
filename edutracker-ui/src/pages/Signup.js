@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 
-const Signup = () => {
+const Signup = ({ setToken }) => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -13,12 +13,31 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/auth/signup', { username, email, password });
-            setMessage('User registered successfully!');
-            setUsername('');
-            setEmail('');
-            setPassword('');
-            navigate('/login'); // Redirect to login after successful signup
+            // Send signup request
+            const response = await axios.post('http://localhost:5000/api/auth/signup', {
+                username,
+                email,
+                password
+            });
+
+            // Check if token is returned
+            if (response.data && response.data.token) {
+                const token = response.data.token;
+
+                // Store token in localStorage
+                localStorage.setItem('token', token);
+                
+                // Optionally store username
+                localStorage.setItem('username', username);
+
+                // Set token in App state if needed
+                setToken(token);
+
+                // Redirect to dashboard
+                navigate('/dashboard');
+            } else {
+                setMessage('Signup was successful, but token is missing. Please log in manually.');
+            }
         } catch (error) {
             setMessage('Signup failed! ' + (error.response?.data.message || 'Please try again.'));
         }
@@ -41,7 +60,7 @@ const Signup = () => {
                 <div className="w-1/2 flex flex-col items-center justify-center p-10">
                     <div className="bg-white p-10 rounded-lg shadow-2xl w-full max-w-md">
                         <h2 className="text-3xl font-semibold mb-6 text-center text-purple-600">Sign Up</h2>
-                        {message && <p className="mt-4 text-green-500 text-center">{message}</p>}
+                        {message && <p className="mt-4 text-red-500 text-center">{message}</p>}
                         <form onSubmit={handleSubmit} className="text-center">
                             <input
                                 type="text"

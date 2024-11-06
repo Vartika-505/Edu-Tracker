@@ -11,16 +11,31 @@ const Login = ({ setToken, setUsername, handleLogout, setAuraPoints }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const localUsername = localStorage.getItem('username');
-        const storedAuraPoints = localStorage.getItem('auraPoints');
+        const checkTokenValidity = async () => {
+            const token = localStorage.getItem('token');
+            const localUsername = localStorage.getItem('username');
+            const storedAuraPoints = localStorage.getItem('auraPoints');
 
-        if (token) {
-            setIsLoggedIn(true);
-            setUsername(localUsername);
-            setAuraPoints(Number(storedAuraPoints));
-        }
-    }, [navigate, setUsername, setAuraPoints]);
+            if (token) {
+                try {
+                    // Check if the token is still valid
+                    await axios.get('http://localhost:5000/api/auth/validate-token', {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    setIsLoggedIn(true);
+                    setUsername(localUsername);
+                    setAuraPoints(Number(storedAuraPoints));
+                } catch (error) {
+                    console.log("Token validation failed, logging out.");
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('auraPoints');
+                    setIsLoggedIn(false);
+                }
+            }
+        };
+        checkTokenValidity();
+    }, [setUsername, setAuraPoints]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -32,6 +47,7 @@ const Login = ({ setToken, setUsername, handleLogout, setAuraPoints }) => {
 
             const { token, auraPoints, userId } = response.data;
 
+            // Store token and user details in local storage
             localStorage.setItem('userId', userId);
             localStorage.setItem('token', token);
             localStorage.setItem('auraPoints', auraPoints);
@@ -40,18 +56,16 @@ const Login = ({ setToken, setUsername, handleLogout, setAuraPoints }) => {
             setUsername(usernameInput);
             setAuraPoints(auraPoints);
 
-            setMessage(`Login successful!`);
+            setMessage('Login successful!');
             setUsernameInput('');
             setPassword('');
             setIsLoggedIn(true);
             navigate('/home');
         } catch (error) {
             console.error("Login error:", error);
-            if (error.response) {
-                setMessage(`Login failed! ${error.response.data.message || error.message}`);
-            } else {
-                setMessage('Login failed! Please try again later.');
-            }
+            setMessage(
+                `Login failed! ${error.response?.data?.message || error.message || 'Please try again later.'}`
+            );
         }
     };
 
@@ -78,7 +92,7 @@ const Login = ({ setToken, setUsername, handleLogout, setAuraPoints }) => {
                         {isLoggedIn ? (
                             <div className="text-center">
                                 <h2 className="text-3xl font-semibold mb-4 text-purple-600">Welcome Back!</h2>
-                                <p className="text-lg mb-4">You are now logged in.</p>
+                                <p className="text-lg mb-4">You are already logged in.</p>
                                 <button onClick={handleLogout} className="bg-purple-400 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200 mb-4">
                                     Logout
                                 </button>
