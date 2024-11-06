@@ -17,6 +17,8 @@ const Navbar = ({ token, handleLogout }) => {
                                     to="/home"
                                     className={`flex items-center h-full px-4 py-2 ${
                                         currentPath === '/home' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                    } ${
+                                        currentPath === '/' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
                                     }`}
                                 >
                                     Home
