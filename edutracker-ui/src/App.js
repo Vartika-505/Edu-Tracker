@@ -1,6 +1,5 @@
-// App.js
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -8,19 +7,26 @@ import Signup from './pages/Signup';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Timetable from './pages/Timetable';
+import Profile from './pages/Profile';
 
 export default function App() {
-  // State to store the token and username
   const [token, setToken] = useState('');
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [auraPoints, setAuraPoints] = useState(0);
-  
+  const [totalTasks, setTotalTasks] = useState(0);
+  const [completedTasks, setCompletedTasks] = useState(0);
+
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove the token
-    localStorage.removeItem('username'); // Remove the username
-    setToken(''); // Clear token in state
-    setUsername(''); // Clear username in state
-    // Redirect to home after logout
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('auraPoints');
+    setToken('');
+    setUsername('');
+    setEmail('');
+    setAuraPoints(0);
+    setTotalTasks(0);
+    setCompletedTasks(0);
   };
 
   return (
@@ -34,6 +40,17 @@ export default function App() {
         <Route exact path="/signup" element={<Signup />} />
         <Route exact path="/about" element={<About />} />
         <Route exact path="/contact" element={<Contact />} />
+        <Route path="/profile" element={
+            <Profile
+                token={token}
+                username={username}
+                email={email}
+                auraPoints={auraPoints}
+                totalTasks={totalTasks}
+                completedTasks={completedTasks}
+                handleLogout={handleLogout}
+            />
+        } />
       </Routes>
     </BrowserRouter>
   );
