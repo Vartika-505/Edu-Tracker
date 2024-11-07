@@ -6,7 +6,7 @@ const Navbar = ({ token, handleLogout }) => {
     const currentPath = window.location.pathname;
 
     return (
-        <nav className="flex items-center px-6 py-4 fixed top-0 justify-between w-screen z-10 bg-white">
+        <nav className="flex items-center px-6 py-4 fixed top-0 left-0 right-0 justify-between w-full z-10 bg-white">
             <img src={logo} alt="EduTracker Logo" width="100px" />
             <div className="flex justify-center items-center h-full absolute right-0 m-[1vw]">
                 <ul className="flex gap-5 mr-10 h-full">
