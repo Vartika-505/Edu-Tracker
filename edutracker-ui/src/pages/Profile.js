@@ -1,15 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
-const Profile = ({ token, username, email, auraPoints, totalTasks, completedTasks, handleLogout }) => {
-    const navigate = useNavigate();
+const Profile = () => {
+    const { token, username, email, auraPoints } = useContext(AuthContext); // Access values from context
     const [profilePic, setProfilePic] = useState(null);
+    const [totalTasks, setTotalTasks] = useState(0);
+    const [completedTasks, setCompletedTasks] = useState(0);
+    const navigate = useNavigate();
 
     // Redirect if not authenticated
-    if (!token) {
-        navigate('/home');
-    }
+    useEffect(() => {
+        if (!token) {
+            navigate('/home'); // Redirect to home if no token
+        } else {
+            fetchTaskSummary();
+        }
+    }, [token, navigate]);
+
+    // Fetch total and completed tasks from the API
+    const fetchTaskSummary = async () => {
+        try {
+            const userId = localStorage.getItem('userId');
+            console.log('User ID:', userId); // Log the userId to check if it's set correctly
+            
+            if (!userId) {
+                navigate('/login'); // Redirect if no userId
+                return;
+            }
+            
+            const response = await fetch(`http://localhost:5000/api/tasks/summary/${userId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch task summary');
+            }
+            
+            const data = await response.json();
+            console.log('Task Summary:', data); // Log the API response to see the data structure
+
+            setTotalTasks(data.totalTasks);
+            setCompletedTasks(data.completedTasks);
+        } catch (error) {
+            console.error('Error fetching task summary:', error);
+        }
+    };
 
     // Handle profile picture upload
     const handleProfilePicUpload = (event) => {
@@ -21,6 +55,12 @@ const Profile = ({ token, username, email, auraPoints, totalTasks, completedTask
             };
             reader.readAsDataURL(file);
         }
+    };
+
+    // Handle logout action
+    const handleLogout = () => {
+        localStorage.clear();
+        navigate('/home');
     };
 
     return (

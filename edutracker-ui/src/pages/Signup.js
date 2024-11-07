@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+// src/components/Signup.js
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
-const Signup = ({ setToken }) => {
+const Signup = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+
+    // Retrieve setToken and other necessary functions from AuthContext
+    const { setToken, setUsername: setGlobalUsername, setUserId } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -20,23 +25,24 @@ const Signup = ({ setToken }) => {
                 password
             });
 
-            // Check if token is returned
-            if (response.data && response.data.token) {
-                const token = response.data.token;
+            // Check if token and userId are returned
+            if (response.data && response.data.token && response.data.userId) {
+                const { token, userId } = response.data;
 
-                // Store token in localStorage
+                // Store token, username, and userId in localStorage for persistence
                 localStorage.setItem('token', token);
-                
-                // Optionally store username
                 localStorage.setItem('username', username);
+                localStorage.setItem('userId', userId);
 
-                // Set token in App state if needed
+                // Update context with token, username, and userId
                 setToken(token);
+                setGlobalUsername(username);
+                setUserId(userId); // Make sure setUserId is defined in AuthContext
 
-                // Redirect to dashboard
+                // Redirect to dashboard after successful signup
                 navigate('/dashboard');
             } else {
-                setMessage('Signup was successful, but token is missing. Please log in manually.');
+                setMessage('Signup was successful, but token or userId is missing. Please log in manually.');
             }
         } catch (error) {
             setMessage('Signup failed! ' + (error.response?.data.message || 'Please try again.'));

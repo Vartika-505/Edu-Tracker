@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+// src/components/Tasks.js
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import Navbar from './Navbar';
+import Navbar from './Navbar'; // Assuming Navbar is in the same folder
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
 
-const Tasks = ({ token, username, setAuraPoints, handleLogout, setTasksForCalendar }) => {
+const Tasks = () => {
+    const { token, username, setAuraPoints, handleLogout } = useContext(AuthContext); // Access context values
     const navigate = useNavigate();
     const [tasks, setTasks] = useState([]);
     const [name, setName] = useState('');
@@ -13,21 +16,23 @@ const Tasks = ({ token, username, setAuraPoints, handleLogout, setTasksForCalend
 
     // Fetch tasks when the component mounts
     useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                const userId = localStorage.getItem('userId');
-                if (!userId) navigate('/login');
-                if (!token) navigate('/home');
-
-                const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`);
-                setTasks(response.data);
-                setTasksForCalendar(response.data); // Update calendar with tasks on load
-            } catch (error) {
-                console.error("Error fetching tasks", error);
-            }
-        };
-        fetchTasks();
-    }, [navigate, token, setTasksForCalendar]);
+        if (!token) {
+            navigate('/login'); // Redirect to login if no token
+        } else {
+            const fetchTasks = async () => {
+                try {
+                    const userId = localStorage.getItem('userId');
+                    if (!userId) navigate('/login'); // Redirect to login if no userId
+                    
+                    const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`);
+                    setTasks(response.data);
+                } catch (error) {
+                    console.error("Error fetching tasks", error);
+                }
+            };
+            fetchTasks();
+        }
+    }, [token, navigate]);
 
     const addTask = async () => {
         const userId = localStorage.getItem('userId');
@@ -41,7 +46,6 @@ const Tasks = ({ token, username, setAuraPoints, handleLogout, setTasksForCalend
             const response = await axios.post('http://localhost:5000/api/tasks', newTask);
             const addedTask = response.data;
             setTasks([...tasks, addedTask]);
-            setTasksForCalendar([...tasks, addedTask]); // Sync new task with calendar
             setName('');
             setCategory('Lecture Attendance');
             setDeadline('');
@@ -73,7 +77,9 @@ const Tasks = ({ token, username, setAuraPoints, handleLogout, setTasksForCalend
 
     return (
         <div className="min-h-screen bg-gradient-to-r from-purple-400 via-purple-300 to-purple-200 p-6 pt-20">
+            {/* Navbar */}
             <Navbar token={token} handleLogout={handleLogout} />
+            
             <div className="mt-8 flex justify-around">
                 {/* Add Task Form */}
                 <div>

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from 'date-fns';
+import { FaCheckCircle } from 'react-icons/fa'; // For icons
 
 const Timetable = ({ token, username, handleLogout }) => {
   const navigate = useNavigate();
@@ -60,15 +61,17 @@ const Timetable = ({ token, username, handleLogout }) => {
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-400 via-purple-300 to-purple-200 p-6 pt-20">
       <Navbar token={token} handleLogout={handleLogout} />
-      <div className="mt-8 flex justify-around">
+      
+      <div className="mt-8 flex flex-col items-center">
+
         {/* Calendar Component */}
-        <div className="w-1/3">
+        <div className="w-full max-w-[80vw] mb-8">
           <h2 className="text-4xl font-bold text-white mb-6 text-center">Calendar</h2>
           <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
             <div className="flex justify-between items-center mb-4">
-              <button onClick={handlePrevMonth} className="text-purple-600">Prev</button>
+              <button onClick={handlePrevMonth} className="text-purple-600 font-semibold">Prev</button>
               <h3 className="font-semibold text-lg">{format(currentDate, 'MMMM yyyy')}</h3>
-              <button onClick={handleNextMonth} className="text-purple-600">Next</button>
+              <button onClick={handleNextMonth} className="text-purple-600 font-semibold">Next</button>
             </div>
             <div className="grid grid-cols-7 gap-2 mb-4">
               <div className="font-bold text-center text-purple-600">Sun</div>
@@ -86,7 +89,7 @@ const Timetable = ({ token, username, handleLogout }) => {
                 return (
                   <div
                     key={index}
-                    className="text-center cursor-pointer p-3 rounded-lg hover:bg-purple-100"
+                    className="text-center cursor-pointer p-3 rounded-lg bg-[#9d4edd] hover:bg-purple-300 transition duration-200 ease-in-out text-white font-semibold"
                     onClick={() => handleDateClick(dayFormatted)}
                   >
                     {format(day, 'd')}
@@ -98,23 +101,30 @@ const Timetable = ({ token, username, handleLogout }) => {
         </div>
 
         {/* Task List */}
-        <div className="w-1/2">
+        <div className="w-full max-w-[80vw]">
           <h3 className="text-4xl font-semibold text-white mb-4 text-center">
             Tasks for {clickedDate || 'Selected Date'}
           </h3>
           <ul className="space-y-4 max-h-[62vh] overflow-y-auto">
             {filteredTasks.length > 0 ? (
               filteredTasks.map(task => (
-                <li key={task._id} className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                <li key={task._id} className="bg-gradient-to-r from-white via-purple-100 to-white p-6 rounded-lg shadow-lg flex justify-between items-center">
                   <div>
-                    <h4 className="text-lg font-semibold text-purple-800">{task.name}</h4>
-                    <p className="text-sm text-gray-500">Due: {formatDeadline(task.deadline)}</p>
+                    <h4 className="text-2xl font-semibold text-purple-800 mb-2">{task.name}</h4>
+                    <p className="text-md text-gray-500">Due Date: {formatDeadline(task.deadline)}</p>
+                    <p className="text-sm text-purple-700">Difficulty Level: {task.difficultyLevel}</p>
                   </div>
                   <button
                     disabled={task.completed}
-                    className={`py-1 px-3 rounded-md text-white ${task.completed ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-800'}`}
+                    className={`py-2 px-4 rounded-lg font-semibold flex items-center space-x-2 ${task.completed ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-800'}`}
                   >
-                    {task.completed ? 'Completed' : 'Complete'}
+                    {task.completed ? (
+                      <>
+                        <FaCheckCircle className="text-green-500" /> <span>Completed</span>
+                      </>
+                    ) : (
+                      <span>Mark as Complete</span>
+                    )}
                   </button>
                 </li>
               ))
