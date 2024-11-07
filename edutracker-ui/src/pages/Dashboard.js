@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
-import logo11 from '../logo11.png';
 import TaskManager from '../components/TaskManager';
 
 const Dashboard = ({ token, username, auraPoints, setAuraPoints, handleLogout }) => {
@@ -27,21 +26,41 @@ const Dashboard = ({ token, username, auraPoints, setAuraPoints, handleLogout })
         authToken && (
             <div className="min-h-screen bg-white flex flex-col items-center p-6">
                 <Navbar token={authToken} handleLogout={handleLogout} />
-                <header className="flex items-center mb-10 mt-20">
-                    <img src={logo11} className="align-center" width="150" alt="Logo" />
+
+            {/* Aura Points Section (Positioned Top Right) */}
+            <div className="absolute top-20 right-10 bg-[#5a189a] shadow-lg rounded-lg p-4 w-48 text-center">
+                    <h2 className="text-xl font-semibold text-white">Aura Points</h2>
+                    <p className="text-2xl text-white font-bold">{points}</p>
+            </div>
+
+                {/* Header Section */}
+                <header className="flex items-center mb-10 mt-20 text-center">
                     <div className="text-left">
-                        <h1 className="text-5xl text-[#2e2e2e]">Welcome to Your Dashboard, {user}!</h1>
-                        <p className="text-lg text-blue-500 mt-2">Here you can track your progress and manage your learning.</p>
+                        <h1 className="text-4xl font-bold text-[#5a189a]"> Welcome, {user}!</h1>
+                        <p className="text-lg text-[#6a4c93] mt-2">Here you can track your progress and manage your learning.</p>
                     </div>
                 </header>
+<<<<<<< HEAD
                 <main className="bg-gradient-to-r from-blue-300 to-green-300 shadow-lg rounded-lg p-8 w-full max-w-md text-center">
                     <h2 className="text-3xl font-semibold text-white mb-6">Your Learning Progress</h2>
                     <p className="text-xl text-white">Aura Points: <span className="font-bold">{points}</span></p>
                 </main>
                 <section className="w-full max-w-2xl p-6 bg-gray-100 rounded-lg shadow-md">
                     <h3 className="text-2xl font-bold text-gray-800 mb-4">Manage Your Tasks</h3>
+=======
+
+                {/* Learning Progress Section
+                <main className="bg-[#9d4edd] shadow-lg rounded-lg p-8 w-full max-w-lg text-center">
+                    <h2 className="text-3xl font-semibold text-white mb-6">Your Learning Progress</h2>
+                    <p className="text-xl text-white">Aura Points: <span className="font-bold">{points}</span></p>
+                </main> */}
+
+                {/* Task Manager Section
+                <section className="w-full max-w-2xl p-6 mt-8 bg-[#f3e5f5] rounded-lg shadow-md">
+                    <h3 className="text-2xl font-bold text-[#6a4c93] mb-4">Manage Your Tasks</h3>
+>>>>>>> 8fcb8aa9b38a46bb98a793177a4bd4238808ec71
                     <TaskManager username={user} setAuraPoints={handleSetAuraPoints} />
-                </section>
+                </section> */}
             </div>
         )
     );
