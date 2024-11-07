@@ -40,14 +40,6 @@ const Dashboard = ({ token, username, auraPoints, setAuraPoints, handleLogout })
                         <p className="text-lg text-[#6a4c93] mt-2">Here you can track your progress and manage your learning.</p>
                     </div>
                 </header>
-<<<<<<< HEAD
-                <main className="bg-gradient-to-r from-blue-300 to-green-300 shadow-lg rounded-lg p-8 w-full max-w-md text-center">
-                    <h2 className="text-3xl font-semibold text-white mb-6">Your Learning Progress</h2>
-                    <p className="text-xl text-white">Aura Points: <span className="font-bold">{points}</span></p>
-                </main>
-                <section className="w-full max-w-2xl p-6 bg-gray-100 rounded-lg shadow-md">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Manage Your Tasks</h3>
-=======
 
                 {/* Learning Progress Section
                 <main className="bg-[#9d4edd] shadow-lg rounded-lg p-8 w-full max-w-lg text-center">
