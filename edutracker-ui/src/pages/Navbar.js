@@ -1,9 +1,12 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+// src/components/Navbar.js
+import React, { useContext } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext to access token and handleLogout
 import logo from '../logo.png';
 
-const Navbar = ({ token, handleLogout }) => {
-    const currentPath = window.location.pathname;
+const Navbar = () => {
+    const { token, handleLogout } = useContext(AuthContext); // Access token and handleLogout from AuthContext
+    const currentPath = useLocation().pathname; // Get current path
 
     return (
         <nav className="flex items-center px-6 py-4 fixed top-0 left-0 right-0 justify-between w-full z-10 bg-white">
@@ -16,9 +19,7 @@ const Navbar = ({ token, handleLogout }) => {
                                 <Link
                                     to="/home"
                                     className={`flex items-center h-full px-4 py-2 ${
-                                        currentPath === '/home' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
-                                    } ${
-                                        currentPath === '/' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
+                                        currentPath === '/home' || currentPath === '/' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
                                     }`}
                                 >
                                     Home

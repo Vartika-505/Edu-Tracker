@@ -1,41 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
-const Login = ({ setToken, setUsername, handleLogout, setAuraPoints }) => {
+const Login = () => {
     const [usernameInput, setUsernameInput] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
 
+    // Retrieve context functions and variables
+    const { token, setToken, setUsername, setUserId, setAuraPoints, handleLogout } = useContext(AuthContext);
+
     useEffect(() => {
         const checkTokenValidity = async () => {
             const token = localStorage.getItem('token');
             const localUsername = localStorage.getItem('username');
             const storedAuraPoints = localStorage.getItem('auraPoints');
+            const storedUserId = localStorage.getItem('userId');
 
             if (token) {
                 try {
-                    // Check if the token is still valid
+                    // Validate token
                     await axios.get('http://localhost:5000/api/auth/validate-token', {
                         headers: { Authorization: `Bearer ${token}` },
                     });
                     setIsLoggedIn(true);
                     setUsername(localUsername);
                     setAuraPoints(Number(storedAuraPoints));
+                    setUserId(storedUserId);  // Set userId from localStorage to context
                 } catch (error) {
                     console.log("Token validation failed, logging out.");
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('username');
-                    localStorage.removeItem('auraPoints');
+                    handleLogout(); // Call handleLogout from context to clear session
                     setIsLoggedIn(false);
                 }
             }
         };
         checkTokenValidity();
-    }, [setUsername, setAuraPoints]);
+    }, [setUsername, setAuraPoints, setUserId, handleLogout]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -48,13 +52,15 @@ const Login = ({ setToken, setUsername, handleLogout, setAuraPoints }) => {
             const { token, auraPoints, userId } = response.data;
 
             // Store token and user details in local storage
-            localStorage.setItem('userId', userId);
+            localStorage.setItem('userId', userId);   // Store userId in localStorage
             localStorage.setItem('token', token);
             localStorage.setItem('auraPoints', auraPoints);
 
-            setToken(token);
-            setUsername(usernameInput);
-            setAuraPoints(auraPoints);
+            // Update context with token, username, auraPoints, and userId
+            setToken(token);            // Update context with token
+            setUsername(usernameInput);  // Update context with username
+            setUserId(userId);           // Update context with userId
+            setAuraPoints(auraPoints);   // Update context with aura points
 
             setMessage('Login successful!');
             setUsernameInput('');
@@ -76,7 +82,7 @@ const Login = ({ setToken, setUsername, handleLogout, setAuraPoints }) => {
     return (
         <div className="min-h-screen flex flex-col">
             {/* Navbar at the top */}
-            <Navbar token={null} handleLogout={handleLogout} />
+            <Navbar token={token} handleLogout={handleLogout} /> {/* Navbar uses context for logout */}
 
             {/* Gradient Background Container */}
             <div className="flex flex-grow bg-gradient-to-br from-purple-600 via-purple-500 to-purple-300">

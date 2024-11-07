@@ -1,53 +1,61 @@
-// frontend/src/components/TaskManager.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
 
-const TaskManager = ({ username, setAuraPoints }) => {
+const TaskManager = () => {
     const [tasks, setTasks] = useState([]);
     const [name, setName] = useState('');
     const [category, setCategory] = useState('Lecture Attendance');
     const [deadline, setDeadline] = useState('');
     const [difficultyLevel, setDifficultyLevel] = useState(50);
 
+    // Access user data and auraPoints from AuthContext
+    const { token, userId, auraPoints, setAuraPoints } = useContext(AuthContext);
+
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const userId = localStorage.getItem('userId');
-                const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`);
+                const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 setTasks(response.data);
             } catch (error) {
-                console.error("Error fetching tasks", error);
+                console.error('Error fetching tasks', error);
             }
         };
-        fetchTasks();
-    }, []);
+        if (userId) fetchTasks();
+    }, [userId, token]);
 
     const addTask = async () => {
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-            console.error("User ID not found");
-            return; // Prevent further execution if userId is not found
+        if (!name || !category || !deadline) {
+            console.error('All fields are required!');
+            return;
         }
+
         const newTask = { userId, name, category, deadline, difficultyLevel };
         try {
-            const response = await axios.post('http://localhost:5000/api/tasks', newTask);
+            const response = await axios.post('http://localhost:5000/api/tasks', newTask, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setTasks([...tasks, response.data]);
             setName('');
             setCategory('Lecture Attendance');
             setDeadline('');
             setDifficultyLevel(50);
         } catch (error) {
-            console.error("Error adding task", error);
+            console.error('Error adding task', error);
         }
     };
 
     const completeTask = async (taskId, difficulty) => {
         try {
-            const response = await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`);
+            const response = await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
-            setAuraPoints(prev => prev + difficulty);
+            setAuraPoints(prev => prev + difficulty); // Update aura points using context
         } catch (error) {
-            console.error("Error completing task", error);
+            console.error('Error completing task', error);
         }
     };
 
@@ -106,11 +114,7 @@ const TaskManager = ({ username, setAuraPoints }) => {
                         <button
                             onClick={() => completeTask(task._id, task.difficultyLevel)}
                             disabled={task.completed}
-                            className={`py-1 px-3 rounded-md text-white ${
-                                task.completed
-                                    ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-purple-600 hover:bg-purple-800 transition-colors'
-                            }`}
+                            className={`py-1 px-3 rounded-md text-white ${task.completed ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-800 transition-colors'}`}
                         >
                             {task.completed ? 'Completed' : 'Complete'}
                         </button>
