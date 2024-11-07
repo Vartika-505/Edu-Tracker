@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 const Profile = () => {
-    const { token, username, email, auraPoints, setAuraPoints } = useContext(AuthContext); // Access values from context
+    const { token, username, email, auraPoints } = useContext(AuthContext); // Access values from context
     const [profilePic, setProfilePic] = useState(null);
     const [totalTasks, setTotalTasks] = useState(0);
     const [completedTasks, setCompletedTasks] = useState(0);
@@ -23,16 +23,25 @@ const Profile = () => {
     const fetchTaskSummary = async () => {
         try {
             const userId = localStorage.getItem('userId');
+            console.log('User ID:', userId); // Log the userId to check if it's set correctly
+            
             if (!userId) {
                 navigate('/login'); // Redirect if no userId
                 return;
             }
+            
             const response = await fetch(`http://localhost:5000/api/tasks/summary/${userId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch task summary');
+            }
+            
             const data = await response.json();
+            console.log('Task Summary:', data); // Log the API response to see the data structure
+
             setTotalTasks(data.totalTasks);
             setCompletedTasks(data.completedTasks);
         } catch (error) {
-            console.error("Error fetching task summary", error);
+            console.error('Error fetching task summary:', error);
         }
     };
 

@@ -13,7 +13,7 @@ const Signup = () => {
     const navigate = useNavigate();
 
     // Retrieve setToken and other necessary functions from AuthContext
-    const { setToken, setUsername: setGlobalUsername } = useContext(AuthContext);
+    const { setToken, setUsername: setGlobalUsername, setUserId } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,22 +25,24 @@ const Signup = () => {
                 password
             });
 
-            // Check if token is returned
-            if (response.data && response.data.token) {
-                const token = response.data.token;
+            // Check if token and userId are returned
+            if (response.data && response.data.token && response.data.userId) {
+                const { token, userId } = response.data;
 
-                // Store token and username in localStorage for persistence
+                // Store token, username, and userId in localStorage for persistence
                 localStorage.setItem('token', token);
                 localStorage.setItem('username', username);
+                localStorage.setItem('userId', userId);
 
-                // Update context with token and username
+                // Update context with token, username, and userId
                 setToken(token);
                 setGlobalUsername(username);
+                setUserId(userId); // Make sure setUserId is defined in AuthContext
 
                 // Redirect to dashboard after successful signup
                 navigate('/dashboard');
             } else {
-                setMessage('Signup was successful, but token is missing. Please log in manually.');
+                setMessage('Signup was successful, but token or userId is missing. Please log in manually.');
             }
         } catch (error) {
             setMessage('Signup failed! ' + (error.response?.data.message || 'Please try again.'));

@@ -1,4 +1,3 @@
-// src/components/Login.js
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -13,13 +12,14 @@ const Login = () => {
     const navigate = useNavigate();
 
     // Retrieve context functions and variables
-    const { token, setToken, setUsername, setAuraPoints, handleLogout } = useContext(AuthContext);
+    const { token, setToken, setUsername, setUserId, setAuraPoints, handleLogout } = useContext(AuthContext);
 
     useEffect(() => {
         const checkTokenValidity = async () => {
             const token = localStorage.getItem('token');
             const localUsername = localStorage.getItem('username');
             const storedAuraPoints = localStorage.getItem('auraPoints');
+            const storedUserId = localStorage.getItem('userId');
 
             if (token) {
                 try {
@@ -30,6 +30,7 @@ const Login = () => {
                     setIsLoggedIn(true);
                     setUsername(localUsername);
                     setAuraPoints(Number(storedAuraPoints));
+                    setUserId(storedUserId);  // Set userId from localStorage to context
                 } catch (error) {
                     console.log("Token validation failed, logging out.");
                     handleLogout(); // Call handleLogout from context to clear session
@@ -38,7 +39,7 @@ const Login = () => {
             }
         };
         checkTokenValidity();
-    }, [setUsername, setAuraPoints, handleLogout]);
+    }, [setUsername, setAuraPoints, setUserId, handleLogout]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -51,12 +52,14 @@ const Login = () => {
             const { token, auraPoints, userId } = response.data;
 
             // Store token and user details in local storage
-            localStorage.setItem('userId', userId);
+            localStorage.setItem('userId', userId);   // Store userId in localStorage
             localStorage.setItem('token', token);
             localStorage.setItem('auraPoints', auraPoints);
 
+            // Update context with token, username, auraPoints, and userId
             setToken(token);            // Update context with token
             setUsername(usernameInput);  // Update context with username
+            setUserId(userId);           // Update context with userId
             setAuraPoints(auraPoints);   // Update context with aura points
 
             setMessage('Login successful!');
@@ -79,7 +82,7 @@ const Login = () => {
     return (
         <div className="min-h-screen flex flex-col">
             {/* Navbar at the top */}
-            <Navbar token={null} handleLogout={handleLogout} /> {/* Navbar uses context for logout */}
+            <Navbar token={token} handleLogout={handleLogout} /> {/* Navbar uses context for logout */}
 
             {/* Gradient Background Container */}
             <div className="flex flex-grow bg-gradient-to-br from-purple-600 via-purple-500 to-purple-300">
