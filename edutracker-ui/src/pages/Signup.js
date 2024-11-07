@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+// src/components/Signup.js
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
-const Signup = ({ setToken }) => {
+const Signup = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+
+    // Retrieve setToken and other necessary functions from AuthContext
+    const { setToken, setUsername: setGlobalUsername } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,16 +29,15 @@ const Signup = ({ setToken }) => {
             if (response.data && response.data.token) {
                 const token = response.data.token;
 
-                // Store token in localStorage
+                // Store token and username in localStorage for persistence
                 localStorage.setItem('token', token);
-                
-                // Optionally store username
                 localStorage.setItem('username', username);
 
-                // Set token in App state if needed
+                // Update context with token and username
                 setToken(token);
+                setGlobalUsername(username);
 
-                // Redirect to dashboard
+                // Redirect to dashboard after successful signup
                 navigate('/dashboard');
             } else {
                 setMessage('Signup was successful, but token is missing. Please log in manually.');

@@ -9,6 +9,7 @@ import Contact from './pages/Contact';
 import Timetable from './pages/Timetable';
 import Profile from './pages/Profile';
 import Tasks from './pages/Tasks';
+import { AuthProvider } from './context/AuthContext';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -40,8 +41,9 @@ export default function App() {
   };
 
   return (
+    <AuthProvider>
     <BrowserRouter>
-      <Routes>
+    <Routes>
         <Route path="/home" element={<Home token={token} username={username} auraPoints={auraPoints} handleLogout={handleLogout} />} />
         <Route path="/dashboard" element={<Dashboard token={token} username={username} auraPoints={auraPoints} setAuraPoints={setAuraPoints} handleLogout={handleLogout} />} />
         <Route path="/tasks" element={<Tasks token={token} username={username} setAuraPoints={setAuraPoints} />} />
@@ -64,5 +66,7 @@ export default function App() {
         } />
       </Routes>
     </BrowserRouter>
+    </AuthProvider>
+      
   );
 }

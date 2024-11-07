@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+// src/components/Tasks.js
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import Navbar from './Navbar'; // Assuming Navbar is in the same folder
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
+import Navbar from './Navbar'; // Assuming Navbar is in the same folder
 
-const Tasks = ({ token, username, setAuraPoints }) => {
+const Tasks = () => {
+    const { token, username, setAuraPoints } = useContext(AuthContext); // Access context values
     const navigate = useNavigate();
     const [tasks, setTasks] = useState([]); 
     const [name, setName] = useState('');
@@ -13,20 +16,24 @@ const Tasks = ({ token, username, setAuraPoints }) => {
 
     // Fetch tasks when the component mounts
     useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                const userId = localStorage.getItem('userId');
-                if (!userId) {
-                    navigate('/login'); // Redirect to login if no userId
+        if (!token) {
+            navigate('/login'); // Redirect to login if no token
+        } else {
+            const fetchTasks = async () => {
+                try {
+                    const userId = localStorage.getItem('userId');
+                    if (!userId) {
+                        navigate('/login'); // Redirect to login if no userId
+                    }
+                    const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`);
+                    setTasks(response.data);
+                } catch (error) {
+                    console.error("Error fetching tasks", error);
                 }
-                const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`);
-                setTasks(response.data);
-            } catch (error) {
-                console.error("Error fetching tasks", error);
-            }
-        };
-        fetchTasks();
-    }, [navigate]);
+            };
+            fetchTasks();
+        }
+    }, [token, navigate]);
 
     // Function to add a new task
     const addTask = async () => {
@@ -89,7 +96,7 @@ const Tasks = ({ token, username, setAuraPoints }) => {
     return (
         <div className="min-h-screen bg-gradient-to-r from-purple-400 via-purple-300 to-purple-200 p-6 pt-20"> {/* Added pt-20 to add space for the navbar */}
             {/* Navbar */}
-            <Navbar token={token} className="pl-0 ml-0" handleLogout={() => { localStorage.clear(); navigate('/home'); }} />
+            <Navbar handleLogout={() => { localStorage.clear(); navigate('/home'); }} />
 
             <div className="mt-8 flex justify-around">
 
