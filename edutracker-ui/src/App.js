@@ -46,10 +46,11 @@ export default function App() {
     <Routes>
         <Route path="/home" element={<Home token={token} username={username} auraPoints={auraPoints} handleLogout={handleLogout} />} />
         <Route path="/dashboard" element={<Dashboard token={token} username={username} auraPoints={auraPoints} setAuraPoints={setAuraPoints} handleLogout={handleLogout} />} />
-        <Route path="/tasks" element={<Tasks token={token} username={username} setAuraPoints={setAuraPoints} />} />
+        <Route path="/tasks" element={<Tasks token={token} username={username} setAuraPoints={setAuraPoints} handleLogout={handleLogout}/>} />
         <Route exact path="/login" element={<Login setToken={setToken} setUsername={setUsername} setAuraPoints={setAuraPoints} />} />
         <Route path="/" element={<Home token={token} username={username} />} />
-        <Route path="/timetable" element={<Timetable />} />
+        <Route path="/timetable" element={<Timetable token={token} username={username} handleLogout={handleLogout} />} />
+
         <Route exact path="/signup" element={<Signup />} />
         <Route exact path="/about" element={<About />} />
         <Route exact path="/contact" element={<Contact />} />
