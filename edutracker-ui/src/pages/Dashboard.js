@@ -1,58 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import Navbar from './Navbar';
+// src/components/Dashboard.js
+import React, { useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
+import Navbar from './Navbar';
 import TaskManager from '../components/TaskManager';
 
-const Dashboard = ({ token, username, auraPoints, setAuraPoints, handleLogout }) => {
+const Dashboard = () => {
     const navigate = useNavigate();
-    const [authToken] = useState(token || localStorage.getItem('token'));
-    const [user] = useState(username || localStorage.getItem('username'));
-    const [points, setPoints] = useState(auraPoints || parseInt(localStorage.getItem('auraPoints')) || 0);
+    const { token, username, auraPoints, setAuraPoints, handleLogout } = useContext(AuthContext); // Use context for token, username, auraPoints
 
+    // Redirect if token is not present
     useEffect(() => {
-        if (!authToken) {
+        if (!token) {
             navigate('/home'); // Redirect to home if no token
         }
-    }, [authToken, navigate]);
-
-    // Function to update aura points in local state and parent component
-    const handleSetAuraPoints = (newPoints) => {
-        setPoints(newPoints);
-        localStorage.setItem('auraPoints', newPoints);
-        setAuraPoints(newPoints);
-    };
+    }, [token, navigate]);
 
     return (
-        authToken && (
+        token && (
             <div className="min-h-screen bg-white flex flex-col items-center p-6">
-                <Navbar token={authToken} handleLogout={handleLogout} />
+                <Navbar token={token} handleLogout={handleLogout} /> {/* Use handleLogout from context */}
 
-            {/* Aura Points Section (Positioned Top Right) */}
-            <div className="absolute top-20 right-10 bg-[#5a189a] shadow-lg rounded-lg p-4 w-48 text-center">
+                {/* Aura Points Section (Positioned Top Right) */}
+                <div className="absolute top-20 right-10 bg-[#5a189a] shadow-lg rounded-lg p-4 w-48 text-center">
                     <h2 className="text-xl font-semibold text-white">Aura Points</h2>
-                    <p className="text-2xl text-white font-bold">{points}</p>
-            </div>
+                    <p className="text-2xl text-white font-bold">{auraPoints}</p> {/* Directly use auraPoints from context */}
+                </div>
 
                 {/* Header Section */}
                 <header className="flex items-center mb-10 mt-20 text-center">
                     <div className="text-left">
-                        <h1 className="text-4xl font-bold text-[#5a189a]"> Welcome, {user}!</h1>
+                        <h1 className="text-4xl font-bold text-[#5a189a]"> Welcome, {username}!</h1>
                         <p className="text-lg text-[#6a4c93] mt-2">Here you can track your progress and manage your learning.</p>
                     </div>
                 </header>
 
-                {/* Learning Progress Section
-                <main className="bg-[#9d4edd] shadow-lg rounded-lg p-8 w-full max-w-lg text-center">
-                    <h2 className="text-3xl font-semibold text-white mb-6">Your Learning Progress</h2>
-                    <p className="text-xl text-white">Aura Points: <span className="font-bold">{points}</span></p>
-                </main> */}
-
-                {/* Task Manager Section
+                {/* Task Manager Section */}
                 <section className="w-full max-w-2xl p-6 mt-8 bg-[#f3e5f5] rounded-lg shadow-md">
                     <h3 className="text-2xl font-bold text-[#6a4c93] mb-4">Manage Your Tasks</h3>
->>>>>>> 8fcb8aa9b38a46bb98a793177a4bd4238808ec71
-                    <TaskManager username={user} setAuraPoints={handleSetAuraPoints} />
-                </section> */}
+                    <TaskManager username={username} setAuraPoints={setAuraPoints} /> {/* Use setAuraPoints directly */}
+                </section>
             </div>
         )
     );
