@@ -15,7 +15,6 @@ const Timetable = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [daysInMonth, setDaysInMonth] = useState([]);
 
-    // Fetch tasks when the component mounts
     useEffect(() => {
         const fetchTasks = async () => {
             try {
