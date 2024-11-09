@@ -1,43 +1,33 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext'; // Import AuthContext
+import { AuthContext } from '../context/AuthContext';
 
 const Profile = () => {
-    const { token, username, email, auraPoints } = useContext(AuthContext); // Access values from context
+    const { token, username, email, auraPoints } = useContext(AuthContext);
     const [profilePic, setProfilePic] = useState(null);
     const [totalTasks, setTotalTasks] = useState(0);
     const [completedTasks, setCompletedTasks] = useState(0);
     const navigate = useNavigate();
 
-    // Redirect if not authenticated
     useEffect(() => {
         if (!token) {
-            navigate('/home'); // Redirect to home if no token
+            navigate('/home');
         } else {
             fetchTaskSummary();
         }
     }, [token, navigate]);
 
-    // Fetch total and completed tasks from the API
     const fetchTaskSummary = async () => {
         try {
             const userId = localStorage.getItem('userId');
-            console.log('User ID:', userId); // Log the userId to check if it's set correctly
-            
             if (!userId) {
-                navigate('/login'); // Redirect if no userId
+                navigate('/login');
                 return;
             }
-            
             const response = await fetch(`http://localhost:5000/api/tasks/summary/${userId}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch task summary');
-            }
-            
+            if (!response.ok) throw new Error('Failed to fetch task summary');
             const data = await response.json();
-            console.log('Task Summary:', data); // Log the API response to see the data structure
-
             setTotalTasks(data.totalTasks);
             setCompletedTasks(data.completedTasks);
         } catch (error) {
@@ -45,39 +35,30 @@ const Profile = () => {
         }
     };
 
-    // Handle profile picture upload
     const handleProfilePicUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfilePic(reader.result); // Set image preview
-            };
+            reader.onloadend = () => setProfilePic(reader.result);
             reader.readAsDataURL(file);
         }
     };
 
-    // Handle logout action
     const handleLogout = () => {
         localStorage.clear();
         navigate('/home');
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-r from-blue-300 to-green-300 flex flex-col items-center p-6">
+        <div className="min-h-screen bg-gradient-to-r from-purple-400 via-purple-300 to-purple-200 p-6 pt-20 flex flex-col items-center">
             <Navbar token={token} handleLogout={handleLogout} />
-            
-            <header className="flex items-center mb-10 mt-20">
-                <div className="text-left">
-                    <h1 className="text-5xl text-[#2e2e2e]">Hello, {username}!</h1>
-                    <p className="text-lg text-blue-500 mt-2">This is your profile dashboard.</p>
-                </div>
-            </header>
 
-            <main className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md text-center">
-                <h2 className="text-3xl font-semibold text-purple-600 mb-6">Profile Information</h2>
-                
-                {/* Profile Picture Section */}
+            <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md text-center mt-10">
+                <header className="flex flex-col items-center mb-10">
+                    <h1 className="text-4xl font-bold text-purple-800">Hello, {username}!</h1>
+                    <p className="text-lg text-gray-500 mt-2">Welcome to your profile dashboard.</p>
+                </header>
+
                 <div className="flex flex-col items-center mb-6">
                     {profilePic ? (
                         <img src={profilePic} alt="Profile" className="w-32 h-32 rounded-full mb-4" />
@@ -92,19 +73,18 @@ const Profile = () => {
                     </label>
                 </div>
 
-                {/* User Information */}
-                <p className="text-xl font-semibold mb-4">{username}</p>
-                <p className="text-lg text-gray-600 mb-4">{email}</p>
-                <p className="text-lg text-gray-600 mb-4">Aura Points: {auraPoints}</p>
+                <div className="bg-purple-100 p-4 rounded-lg text-left w-full mt-4">
+                    <h2 className="text-2xl font-semibold text-purple-600 mb-4">Achievements</h2>
+                    <p className="text-lg text-gray-600">Aura Points: {auraPoints}</p>
+                </div>
 
-                {/* Task Summary */}
-                <div className="text-left mt-6">
-                    <p className="text-lg font-semibold text-purple-600 mb-2">Tasks Summary:</p>
-                    <p className="text-gray-700">Total Tasks: {totalTasks}</p>
-                    <p className="text-green-500">Completed Tasks: {completedTasks}</p>
+                <div className="bg-purple-100 p-4 rounded-lg text-left w-full mt-6">
+                    <h2 className="text-2xl font-semibold text-purple-600 mb-4">Tasks Summary</h2>
+                    <p className="text-gray-700 mb-2">Total Tasks Assigned: {totalTasks}</p>
+                    <p className="text-green-500 mb-2">Completed Tasks: {completedTasks}</p>
                     <p className="text-red-500">Tasks to Complete: {totalTasks - completedTasks}</p>
                 </div>
-            </main>
+            </div>
         </div>
     );
 };

@@ -1,26 +1,25 @@
 // src/components/Home.js
 import React, { useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
+import { AuthContext } from '../context/AuthContext'; 
 import Navbar from './Navbar';
 
-import picture from '../picture.jpeg';
-import collaborate from '../collaborate.jpeg';
-import music from '../music.jpeg';
-import levelup from '../levelup.jpeg';
+import picture from '../images/picture.jpeg';
+import collaborate from '../images/collaborate.jpeg';
+import music from '../images/music.jpeg';
+import levelup from '../images/levelup.jpeg';
 
 const Home = () => {
     const navigate = useNavigate();
-    const { token, username, setToken, setUsername } = useContext(AuthContext); // Get token, username, setToken, setUsername from context
-
+    const { token, username, setToken, setUsername } = useContext(AuthContext); 
     useEffect(() => {
         if (token) {
-            navigate('/dashboard'); // Redirect to dashboard if user is logged in
+            navigate('/dashboard'); 
         }
     }, [token, navigate]);
 
     const handleLogout = () => {
-        // Clear context and localStorage
+        
         setToken('');
         setUsername('');
         localStorage.removeItem('token');

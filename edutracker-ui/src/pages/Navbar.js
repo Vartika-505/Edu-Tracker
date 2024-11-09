@@ -2,7 +2,7 @@
 import React, { useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext'; // Import AuthContext to access token and handleLogout
-import logo from '../logo.png';
+import logo from '../images/logo.png';
 
 const Navbar = () => {
     const { token, handleLogout } = useContext(AuthContext); // Access token and handleLogout from AuthContext
