@@ -1,5 +1,5 @@
-import React, { useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
 import Navbar from './Navbar';
 import MotivationQuote from './MotivationQuote';
@@ -7,6 +7,8 @@ import MotivationQuote from './MotivationQuote';
 const Dashboard = () => {
     const navigate = useNavigate();
     const { token, username, auraPoints, setAuraPoints, handleLogout } = useContext(AuthContext); // Use context for token, username, auraPoints
+    const [hours, setHours] = useState(0);
+    const [minutes, setMinutes] = useState(0);
 
     // Redirect if token is not present
     useEffect(() => {
@@ -23,9 +25,27 @@ const Dashboard = () => {
 
     const level = calculateLevel(auraPoints);
 
+    // Handle the click to show input fields for time
+    const handleClick = () => {
+        navigate('/timer', { state: { hours, minutes } }); // Redirect to Timer.js with state carrying hours and minutes
+    };
+
+    // Handle input changes and validate hours and minutes
+    const handleHourChange = (event) => {
+        let value = parseInt(event.target.value) || 0;
+        if (value > 24) value = 24; // Maximum of 24 hours
+        setHours(value);
+    };
+
+    const handleMinuteChange = (event) => {
+        let value = parseInt(event.target.value) || 0;
+        if (value > 59) value = 59; // Maximum of 59 minutes
+        setMinutes(value);
+    };
+
     return (
         token && (
-            <div className="min-h-screen bg-white flex flex-col items-center p-6">
+            <div className="min-h-screen bg-white flex flex-col items-center p-6 relative overflow-hidden">
                 {/* Navbar */}
                 <Navbar handleLogout={handleLogout} /> {/* Use handleLogout from context */}
 
@@ -44,6 +64,45 @@ const Dashboard = () => {
                     </div>
                 </header>
 
+                {/* Timer Section */}
+                <div className="mt-6">
+                    <div className="flex flex-col items-center">
+                        <div className="mb-4 flex flex-col items-center">
+                            <div className="mb-6">
+                                <input
+                                    type="number"
+                                    id="hours"
+                                    value={hours}
+                                    onChange={handleHourChange}
+                                    className="w-20 p-2 border border-gray-300 rounded-lg text-center"
+                                    placeholder="Hours"
+                                    min="0"
+                                    max="24"
+                                />
+                            </div>
+                            <div className="mb-6">
+                                <input
+                                    type="number"
+                                    id="minutes"
+                                    value={minutes}
+                                    onChange={handleMinuteChange}
+                                    className="w-20 p-2 border border-gray-300 rounded-lg text-center"
+                                    placeholder="Minutes"
+                                    min="0"
+                                    max="59"
+                                />
+                            </div>
+                            <button
+                                onClick={handleClick} // Trigger the navigation to Timer page with input time
+                                className="bg-[#9d4edd] text-white py-2 px-4 rounded-lg"
+                            >
+                                Start Timer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Motivation Quote Section */}
                 <MotivationQuote />
             </div>
         )

@@ -10,7 +10,7 @@ import Timetable from './pages/Timetable';
 import Profile from './pages/Profile';
 import Tasks from './pages/Tasks';
 import { AuthProvider } from './context/AuthContext';
-
+import Timer from './pages/Timer';
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
@@ -50,9 +50,9 @@ export default function App() {
         <Route exact path="/login" element={<Login setToken={setToken} setUsername={setUsername} setAuraPoints={setAuraPoints} />} />
         <Route path="/" element={<Home token={token} username={username} />} />
         <Route path="/timetable" element={<Timetable token={token} username={username} handleLogout={handleLogout} />} />
-
         <Route exact path="/signup" element={<Signup />} />
         <Route exact path="/about" element={<About />} />
+        <Route exact path="/timer" element={<Timer />} />
         <Route exact path="/contact" element={<Contact />} />
         <Route path="/profile" element={
           <Profile
