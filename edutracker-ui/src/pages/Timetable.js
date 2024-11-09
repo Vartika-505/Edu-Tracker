@@ -3,7 +3,7 @@ import axios from 'axios';
 import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from 'date-fns';
-import { FaCheckCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaStar } from 'react-icons/fa'; // Import star icons
 import { AuthContext } from '../context/AuthContext';
 
 const Timetable = () => {
@@ -60,6 +60,29 @@ const Timetable = () => {
     const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
     const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
 
+    // Toggle task's "starred" state locally
+    const handleTaskStarred = (taskId) => {
+        // Update tasks in the local state without making backend updates
+        const updatedTasks = tasks.map(task => {
+            if (task._id === taskId) {
+                return { ...task, isStarred: !task.isStarred };
+            }
+            return task;
+        });
+
+        // Sort tasks to put the "starred" ones on top
+        const sortedTasks = updatedTasks.sort((a, b) => {
+            if (a.isStarred && !b.isStarred) return -1;
+            if (!a.isStarred && b.isStarred) return 1;
+            return 0;
+        });
+
+        // Filter tasks by date and apply sorting
+        const filtered = sortedTasks.filter(task => formatDeadline(task.deadline) === clickedDate);
+        setTasks(sortedTasks); // Update tasks with sorted order
+        setFilteredTasks(filtered); // Update filtered tasks based on date
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-r from-purple-400 via-purple-300 to-purple-200 p-6 pt-20">
             <Navbar />
@@ -115,18 +138,30 @@ const Timetable = () => {
                                         <p className="text-md text-gray-500">Due Date: {formatDeadline(task.deadline)}</p>
                                         <p className="text-sm text-purple-700">Difficulty Level: {task.difficultyLevel}</p>
                                     </div>
-                                    <button
-                                        disabled={task.completed}
-                                        className={`py-2 px-4 rounded-lg font-semibold flex items-center space-x-2 ${task.completed ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-800'}`}
-                                    >
-                                        {task.completed ? (
-                                            <>
-                                                <FaCheckCircle className="text-green-500" /> <span>Completed</span>
-                                            </>
-                                        ) : (
-                                            <span>Mark as Complete</span>
-                                        )}
-                                    </button>
+
+                                    {/* Star to mark as starred */}
+                                    <div className="flex items-center space-x-4">
+                                        <button
+                                            onClick={() => handleTaskStarred(task._id)}
+                                            className={`text-xl ${task.isStarred ? 'text-yellow-500' : 'text-gray-500'}`}
+                                        >
+                                            <FaStar />
+                                        </button>
+
+                                        {/* Mark as complete button */}
+                                        <button
+                                            disabled={task.completed}
+                                            className={`py-2 px-4 rounded-lg font-semibold flex items-center space-x-2 ${task.completed ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-800'}`}
+                                        >
+                                            {task.completed ? (
+                                                <>
+                                                    <FaCheckCircle className="text-green-500" /> <span>Completed</span>
+                                                </>
+                                            ) : (
+                                                <span>Mark as Complete</span>
+                                            )}
+                                        </button>
+                                    </div>
                                 </li>
                             ))
                         ) : (

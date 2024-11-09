@@ -1,0 +1,33 @@
+// src/components/MotivationQuote.js
+import React, { useEffect, useState } from 'react';
+
+const MotivationQuote = () => {
+    const [quote, setQuote] = useState("");
+
+    useEffect(() => {
+        // Fetch the quotes from the public directory
+        fetch(`${process.env.PUBLIC_URL}/study_motivation_quotes.txt`)
+            .then(response => response.text())
+            .then(data => {
+                const quotesArray = data.split('\n').filter(quote => quote.trim() !== ""); // Split by new lines and filter out empty lines
+                const lastIndex = parseInt(localStorage.getItem('quoteIndex'), 10) || 0; // Get last index or default to 0
+                
+                // If index exceeds array length, reset it to 0
+                const newIndex = (lastIndex + 1) % quotesArray.length;
+                
+                // Save the new index to localStorage
+                localStorage.setItem('quoteIndex', newIndex);
+                
+                setQuote(quotesArray[newIndex]);
+            })
+            .catch(error => console.error("Error loading quotes:", error));
+    }, []);
+
+    return (
+        <div className="bg-[#e0f7fa] p-4 rounded-lg mt-4">
+            <p className="text-lg text-[#00796b] font-semibold italic">"{quote}"</p>
+        </div>
+    );
+};
+
+export default MotivationQuote;

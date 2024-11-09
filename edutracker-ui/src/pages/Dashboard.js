@@ -1,9 +1,8 @@
-// src/components/Dashboard.js
 import React, { useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
 import Navbar from './Navbar';
-import Tasks from './Tasks';
+import MotivationQuote from './MotivationQuote';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -45,11 +44,7 @@ const Dashboard = () => {
                     </div>
                 </header>
 
-                {/* Task Manager Section */}
-                <section className="w-full max-w-2xl p-6 mt-8 bg-[#f3e5f5] rounded-lg shadow-md">
-                    <h3 className="text-2xl font-bold text-[#6a4c93] mb-4">Manage Your Tasks</h3>
-                    <Tasks username={username} setAuraPoints={setAuraPoints} /> {/* Use setAuraPoints directly */}
-                </section>
+                <MotivationQuote />
             </div>
         )
     );

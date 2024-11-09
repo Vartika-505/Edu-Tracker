@@ -1,0 +1,45 @@
+// src/components/Dashboard.js
+import React, { useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import Navbar from './Navbar';
+import Tasks from './Tasks';
+import MotivationQuote from './MotivationQuote';
+
+const Dashboard = () => {
+    const navigate = useNavigate();
+    const { token, username, auraPoints, setAuraPoints, handleLogout } = useContext(AuthContext);
+
+    // Redirect if token is not present
+    useEffect(() => {
+        if (!token) {
+            navigate('/home');
+        }
+    }, [token, navigate]);
+
+    // Calculate level based on aura points
+    function calculateLevel(auraPoints) {
+        if (auraPoints < 500) return 1;
+        return 1 + Math.ceil((auraPoints - 500) / 600);
+    }
+
+    const level = calculateLevel(auraPoints);
+
+    return (
+        token && (
+            <div className="min-h-screen bg-white flex flex-col items-center p-6 pt-20">
+                {/* Navbar */}
+                <Navbar handleLogout={handleLogout} />
+
+                {/* Content Section */}
+                <section className="mt-6 w-full max-w-2xl">
+                    <div className="bg-[#e0f7fa] p-4 rounded-lg shadow-md">
+                        <MotivationQuote /> {/* Display random motivational quote */}
+                    </div>
+                </section>
+            </div>
+        )
+    );
+};
+
+export default Dashboard;
