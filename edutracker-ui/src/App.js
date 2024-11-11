@@ -9,8 +9,10 @@ import Contact from './pages/Contact';
 import Timetable from './pages/Timetable';
 import Profile from './pages/Profile';
 import Tasks from './pages/Tasks';
+import Leaderboard from './pages/Leaderboard';
 import { AuthProvider } from './context/AuthContext';
 import Timer from './pages/Timer';
+
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
@@ -54,6 +56,7 @@ export default function App() {
         <Route exact path="/about" element={<About />} />
         <Route exact path="/timer" element={<Timer />} />
         <Route exact path="/contact" element={<Contact />} />
+        <Route path="/leaderboard" element={<Leaderboard />} /> {/* Leaderboard route */}
         <Route path="/profile" element={
           <Profile
             token={token}

@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
     const [totalTasks, setTotalTasks] = useState(parseInt(localStorage.getItem('totalTasks')) || 0);
     const [completedTasks, setCompletedTasks] = useState(parseInt(localStorage.getItem('completedTasks')) || 0);
     const [userId, setUserId] = useState(localStorage.getItem('userId') || ''); // Add userId state
-
+   
     // Sync the states with localStorage whenever they change
     useEffect(() => {
         localStorage.setItem('token', token);

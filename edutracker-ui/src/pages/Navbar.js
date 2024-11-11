@@ -1,4 +1,3 @@
-// src/components/Navbar.js
 import React, { useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext'; // Import AuthContext to access token and handleLogout
@@ -24,8 +23,8 @@ const Navbar = () => {
                             <li className="h-full">
                                 <Link
                                     to="/home"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/home' || currentPath === '/' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
-                                        }`}
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/home' || currentPath === '/' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}
+                                    `}
                                 >
                                     Home
                                 </Link>
@@ -33,8 +32,8 @@ const Navbar = () => {
                             <li className="h-full">
                                 <Link
                                     to="/about"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/about' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
-                                        }`}
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/about' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}
+                                    `}
                                 >
                                     About
                                 </Link>
@@ -42,8 +41,8 @@ const Navbar = () => {
                             <li className="h-full">
                                 <Link
                                     to="/services"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/services' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
-                                        }`}
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/services' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}
+                                    `}
                                 >
                                     Services
                                 </Link>
@@ -51,8 +50,8 @@ const Navbar = () => {
                             <li className="h-full">
                                 <Link
                                     to="/contact"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/contact' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
-                                        }`}
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/contact' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}
+                                    `}
                                 >
                                     Contact
                                 </Link>
@@ -63,8 +62,8 @@ const Navbar = () => {
                             <li className="h-full">
                                 <Link
                                     to="/dashboard"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/dashboard' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
-                                        }`}
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/dashboard' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}
+                                    `}
                                 >
                                     Dashboard
                                 </Link>
@@ -72,8 +71,8 @@ const Navbar = () => {
                             <li className="h-full">
                                 <Link
                                     to="/timetable"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/timetable' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
-                                        }`}
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/timetable' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}
+                                    `}
                                 >
                                     Timetable
                                 </Link>
@@ -81,8 +80,8 @@ const Navbar = () => {
                             <li className="h-full">
                                 <Link
                                     to="/tasks"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/tasks' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
-                                        }`}
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/tasks' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}
+                                    `}
                                 >
                                     Tasks
                                 </Link>
@@ -90,10 +89,20 @@ const Navbar = () => {
                             <li className="h-full">
                                 <Link
                                     to="/profile"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'
-                                        }`}
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}
+                                    `}
                                 >
                                     Profile
+                                </Link>
+                            </li>
+                            {/* Leaderboard Link */}
+                            <li className="h-full">
+                                <Link
+                                    to="/leaderboard"
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/leaderboard' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}
+                                    `}
+                                >
+                                    Leaderboard
                                 </Link>
                             </li>
                         </>
