@@ -8,6 +8,7 @@ const Profile = () => {
     const [profilePic, setProfilePic] = useState(null);
     const [totalTasks, setTotalTasks] = useState(0);
     const [completedTasks, setCompletedTasks] = useState(0);
+    const [imageUrl, setImageUrl] = useState(''); 
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -36,12 +37,9 @@ const Profile = () => {
     };
 
     const handleProfilePicUpload = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setProfilePic(reader.result);
-            reader.readAsDataURL(file);
-        }
+        const url = event.target.value;
+        setImageUrl(url); 
+        setProfilePic(url); // Set profile pic to the provided URL
     };
 
     const handleLogout = () => {
@@ -69,8 +67,23 @@ const Profile = () => {
                     )}
                     <label className="bg-purple-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-purple-700 transition">
                         Upload Picture
-                        <input type="file" onChange={handleProfilePicUpload} className="hidden" />
+                        <input
+                            type="file"
+                            onChange={handleProfilePicUpload}
+                            className="hidden"
+                        />
                     </label>
+
+                    {/* Input for URL to upload profile picture */}
+                    <div className="mt-4">
+                        <input
+                            type="text"
+                            value={imageUrl}
+                            onChange={handleProfilePicUpload}
+                            placeholder="Enter image URL"
+                            className="px-4 py-2 rounded-md border border-purple-300"
+                        />
+                    </div>
                 </div>
 
                 <div className="bg-purple-100 p-4 rounded-lg text-left w-full mt-4">

@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';       // Import database connection
 import authRoutes from './routes/authRoutes.js'; // Import auth routes
 import taskRoutes from './routes/tasks.js';
-
+import leaderboardRoutes from './routes/leaderboard.js';
 dotenv.config();
 
 const app = express();
@@ -22,7 +22,7 @@ connectDB().then(() => {
         console.log(`Server running on port ${PORT}`);
     });
 });
-
+app.use('/api/leaderboard', leaderboardRoutes);
 // Routes
 app.use('/api/auth', authRoutes); // Use the auth routes for signup/login
 app.use('/api/tasks', taskRoutes);

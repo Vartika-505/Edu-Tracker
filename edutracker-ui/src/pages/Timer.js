@@ -131,12 +131,28 @@ const Timer = () => {
                             {hours < 10 ? '0' + hours : hours}
                         </div>
 
+                        {/* Colon Separator */}
+                        <div
+                            className="text-[12vw] text-yellow-500 flex items-center justify-center"
+                            style={glowStyle}
+                        >
+                            :
+                        </div>
+
                         {/* Minutes */}
                         <div
                             className="text-[12vw] flex items-center justify-center"
                             style={glowStyle}
                         >
                             {minutes < 10 ? '0' + minutes : minutes}
+                        </div>
+
+                        {/* Colon Separator */}
+                        <div
+                            className="text-[12vw] text-yellow-500 flex items-center justify-center"
+                            style={glowStyle}
+                        >
+                            :
                         </div>
 
                         {/* Seconds */}

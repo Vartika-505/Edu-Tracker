@@ -1,4 +1,3 @@
-// src/components/MotivationQuote.js
 import React, { useEffect, useState } from 'react';
 
 const MotivationQuote = () => {
@@ -10,22 +9,17 @@ const MotivationQuote = () => {
       .then(response => response.text())
       .then(data => {
         const quotesArray = data.split('\n').filter(quote => quote.trim() !== ""); // Split by new lines and filter out empty lines
+        
+        // Get a random quote index every time the page is refreshed
+        const randomQuoteIndex = Math.floor(Math.random() * quotesArray.length); // Random index between 0 and quotesArray.length - 1
+        
+        // Save the random index to localStorage (optional, in case you want to maintain the index)
+        localStorage.setItem('quoteIndex', randomQuoteIndex);
 
-        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-        const storedDate = localStorage.getItem('quoteDate');
-        let quoteIndex = parseInt(localStorage.getItem('quoteIndex'), 10) || 0;
-
-        // If the stored date is not today, update the quote index
-        if (storedDate !== today) {
-          quoteIndex = (quoteIndex + 1) % quotesArray.length; // Move to the next quote
-          localStorage.setItem('quoteIndex', quoteIndex);      // Update index in localStorage
-          localStorage.setItem('quoteDate', today);            // Update date in localStorage
-        }
-
-        setQuote(quotesArray[quoteIndex]); // Set the selected quote
+        setQuote(quotesArray[randomQuoteIndex]); // Set the selected random quote
       })
       .catch(error => console.error("Error loading quotes:", error));
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on component mount
 
   return (
     <div className="bg-[#e0f7fa] p-4 rounded-lg mt-4">

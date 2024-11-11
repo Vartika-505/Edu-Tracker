@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
 import Navbar from './Navbar';
 import MotivationQuote from './MotivationQuote';
-
+import Leaderboard from './Leaderboard';
 const Dashboard = () => {
     const navigate = useNavigate();
     const { token, username, auraPoints, setAuraPoints, handleLogout } = useContext(AuthContext); // Use context for token, username, auraPoints
@@ -99,6 +99,7 @@ const Dashboard = () => {
                                 Start Timer
                             </button>
                         </div>
+                        <Leaderboard />
                     </div>
                 </div>
 

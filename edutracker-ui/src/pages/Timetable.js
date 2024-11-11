@@ -7,7 +7,7 @@ import { FaCheckCircle, FaStar } from 'react-icons/fa'; // Import star icons
 import { AuthContext } from '../context/AuthContext';
 
 const Timetable = () => {
-    const { token, handleLogout } = useContext(AuthContext);
+    const { token, handleLogout, auraPoints, setAuraPoints } = useContext(AuthContext); // Add auraPoints and setAuraPoints from context
     const navigate = useNavigate();
     const [tasks, setTasks] = useState([]);
     const [clickedDate, setClickedDate] = useState('');
@@ -74,13 +74,23 @@ const Timetable = () => {
         setFilteredTasks(filtered); 
     };
 
-    // Mark task as complete and update the backend
+    // Mark task as complete, increase aura points, and update the backend
     const handleMarkComplete = async (taskId) => {
         try {
             const currentDate = new Date();
-            await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`, { completionDate: currentDate });
-            setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
-            setFilteredTasks(filteredTasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
+            const response = await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`, { completionDate: currentDate });
+            
+            if (response.status === 200) { // If the task is marked complete successfully
+                const newAuraPoints = auraPoints + 50; // Increase aura points by 50 (or any value you prefer)
+                setAuraPoints(newAuraPoints); // Update the context with new aura points
+                
+                // Update task completion state
+                setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
+                setFilteredTasks(filteredTasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
+
+                // Optional: Send a request to update aura points in the backend
+                await axios.patch(`http://localhost:5000/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
+            }
         } catch (error) {
             console.error("Error completing task", error);
         }
