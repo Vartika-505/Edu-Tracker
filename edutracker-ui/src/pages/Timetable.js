@@ -31,7 +31,6 @@ const Timetable = () => {
         fetchTasks();
     }, [navigate, token]);
 
-    // Format date function for comparison
     const formatDeadline = (date) => {
         const d = new Date(date);
         if (isNaN(d.getTime())) return '';
@@ -41,27 +40,22 @@ const Timetable = () => {
         return `${day}/${month}/${year}`;
     };
 
-    // Update the days of the current month
     useEffect(() => {
         const start = startOfMonth(currentDate);
         const end = endOfMonth(currentDate);
         setDaysInMonth(eachDayOfInterval({ start, end }));
     }, [currentDate]);
 
-    // Handle date click
     const handleDateClick = (date) => {
         setClickedDate(date);
         const filtered = tasks.filter(task => formatDeadline(task.deadline) === date);
         setFilteredTasks(filtered);
     };
 
-    // Handle month navigation
     const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
     const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
 
-    // Toggle task's "starred" state locally
     const handleTaskStarred = (taskId) => {
-        // Update tasks in the local state without making backend updates
         const updatedTasks = tasks.map(task => {
             if (task._id === taskId) {
                 return { ...task, isStarred: !task.isStarred };
@@ -69,17 +63,27 @@ const Timetable = () => {
             return task;
         });
 
-        // Sort tasks to put the "starred" ones on top
         const sortedTasks = updatedTasks.sort((a, b) => {
             if (a.isStarred && !b.isStarred) return -1;
             if (!a.isStarred && b.isStarred) return 1;
             return 0;
         });
 
-        // Filter tasks by date and apply sorting
         const filtered = sortedTasks.filter(task => formatDeadline(task.deadline) === clickedDate);
-        setTasks(sortedTasks); // Update tasks with sorted order
-        setFilteredTasks(filtered); // Update filtered tasks based on date
+        setTasks(sortedTasks); 
+        setFilteredTasks(filtered); 
+    };
+
+    // Mark task as complete and update the backend
+    const handleMarkComplete = async (taskId) => {
+        try {
+            const currentDate = new Date();
+            await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`, { completionDate: currentDate });
+            setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
+            setFilteredTasks(filteredTasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
+        } catch (error) {
+            console.error("Error completing task", error);
+        }
     };
 
     return (
@@ -87,7 +91,6 @@ const Timetable = () => {
             <Navbar />
             
             <div className="mt-8 flex flex-col items-center">
-                {/* Calendar Component */}
                 <div className="w-full max-w-[80vw] mb-8">
                     <h2 className="text-4xl font-bold text-white mb-6 text-center">Calendar</h2>
                     <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
@@ -123,7 +126,6 @@ const Timetable = () => {
                     </div>
                 </div>
 
-                {/* Task List */}
                 <div className="w-full max-w-[80vw]">
                     <h3 className="text-4xl font-semibold text-white mb-4 text-center">
                         Tasks for {clickedDate || 'Selected Date'}
@@ -138,7 +140,6 @@ const Timetable = () => {
                                         <p className="text-sm text-purple-700">Difficulty Level: {task.difficultyLevel}</p>
                                     </div>
 
-                                    {/* Star to mark as starred */}
                                     <div className="flex items-center space-x-4">
                                         <button
                                             onClick={() => handleTaskStarred(task._id)}
@@ -147,8 +148,8 @@ const Timetable = () => {
                                             <FaStar />
                                         </button>
 
-                                        {/* Mark as complete button */}
                                         <button
+                                            onClick={() => handleMarkComplete(task._id)}
                                             disabled={task.completed}
                                             className={`py-2 px-4 rounded-lg font-semibold flex items-center space-x-2 ${task.completed ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-800'}`}
                                         >
