@@ -12,6 +12,8 @@ import Tasks from './pages/Tasks';
 import Leaderboard from './pages/Leaderboard';
 import { AuthProvider } from './context/AuthContext';
 import Timer from './pages/Timer';
+import Notes from './pages/Notes';  // Import Notes page
+import { NotesProvider } from './context/NotesContext';  // Import NotesProvider
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -44,33 +46,37 @@ export default function App() {
 
   return (
     <AuthProvider>
-    <BrowserRouter>
-    <Routes>
-        <Route path="/home" element={<Home token={token} username={username} auraPoints={auraPoints} handleLogout={handleLogout} />} />
-        <Route path="/dashboard" element={<Dashboard token={token} username={username} auraPoints={auraPoints} setAuraPoints={setAuraPoints} handleLogout={handleLogout} />} />
-        <Route path="/tasks" element={<Tasks token={token} username={username} setAuraPoints={setAuraPoints} handleLogout={handleLogout}/>} />
-        <Route exact path="/login" element={<Login setToken={setToken} setUsername={setUsername} setAuraPoints={setAuraPoints} />} />
-        <Route path="/" element={<Home token={token} username={username} />} />
-        <Route path="/timetable" element={<Timetable token={token} username={username} handleLogout={handleLogout} />} />
-        <Route exact path="/signup" element={<Signup />} />
-        <Route exact path="/about" element={<About />} />
-        <Route exact path="/timer" element={<Timer />} />
-        <Route exact path="/contact" element={<Contact />} />
-        <Route path="/leaderboard" element={<Leaderboard />} /> {/* Leaderboard route */}
-        <Route path="/profile" element={
-          <Profile
-            token={token}
-            username={username}
-            email={email}
-            auraPoints={auraPoints}
-            totalTasks={totalTasks}
-            completedTasks={completedTasks}
-            handleLogout={handleLogout}
-          />
-        } />
-      </Routes>
-    </BrowserRouter>
+      <NotesProvider>  {/* Wrap your routes with NotesProvider */}
+        <BrowserRouter>
+          <Routes>
+            {/* Define all routes */}
+            <Route path="/home" element={<Home token={token} username={username} auraPoints={auraPoints} handleLogout={handleLogout} />} />
+            <Route path="/dashboard" element={<Dashboard token={token} username={username} auraPoints={auraPoints} setAuraPoints={setAuraPoints} handleLogout={handleLogout} />} />
+            <Route path="/tasks" element={<Tasks token={token} username={username} setAuraPoints={setAuraPoints} handleLogout={handleLogout} />} />
+            <Route path="/login" element={<Login setToken={setToken} setUsername={setUsername} setAuraPoints={setAuraPoints} />} />
+            <Route path="/" element={<Home token={token} username={username} />} />
+            <Route path="/timetable" element={<Timetable token={token} username={username} handleLogout={handleLogout} />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/timer" element={<Timer />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/notes" element={<Notes username={username} />} />  {/* Notes page */}
+            <Route path="/leaderboard" element={<Leaderboard username={username} />} /> {/* Pass username to Leaderboard */}
+            <Route path="/profile" element={
+              <Profile
+                token={token}
+                username={username}
+                email={email}
+                auraPoints={auraPoints}
+                totalTasks={totalTasks}
+                completedTasks={completedTasks}
+                handleLogout={handleLogout}
+              />
+            } />
+          </Routes>
+        </BrowserRouter>
+      </NotesProvider>
     </AuthProvider>
-      
   );
 }

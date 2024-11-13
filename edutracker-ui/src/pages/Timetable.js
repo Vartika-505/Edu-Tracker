@@ -3,11 +3,11 @@ import axios from 'axios';
 import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from 'date-fns';
-import { FaCheckCircle, FaStar } from 'react-icons/fa'; // Import star icons
+import { FaCheckCircle, FaStar } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
 
 const Timetable = () => {
-    const { token, handleLogout, auraPoints, setAuraPoints } = useContext(AuthContext); // Add auraPoints and setAuraPoints from context
+    const { token, handleLogout, auraPoints, setAuraPoints } = useContext(AuthContext);
     const navigate = useNavigate();
     const [tasks, setTasks] = useState([]);
     const [clickedDate, setClickedDate] = useState('');
@@ -70,25 +70,22 @@ const Timetable = () => {
         });
 
         const filtered = sortedTasks.filter(task => formatDeadline(task.deadline) === clickedDate);
-        setTasks(sortedTasks); 
-        setFilteredTasks(filtered); 
+        setTasks(sortedTasks);
+        setFilteredTasks(filtered);
     };
 
-    // Mark task as complete, increase aura points, and update the backend
     const handleMarkComplete = async (taskId) => {
         try {
             const currentDate = new Date();
             const response = await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`, { completionDate: currentDate });
             
-            if (response.status === 200) { // If the task is marked complete successfully
-                const newAuraPoints = auraPoints + 50; // Increase aura points by 50 (or any value you prefer)
-                setAuraPoints(newAuraPoints); // Update the context with new aura points
+            if (response.status === 200) {
+                const newAuraPoints = auraPoints + 50;
+                setAuraPoints(newAuraPoints);
                 
-                // Update task completion state
                 setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
                 setFilteredTasks(filteredTasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
 
-                // Optional: Send a request to update aura points in the backend
                 await axios.patch(`http://localhost:5000/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
             }
         } catch (error) {
@@ -120,6 +117,12 @@ const Timetable = () => {
                         </div>
 
                         <div className="grid grid-cols-7 gap-2">
+                            {/* Empty placeholders for days before the first of the month */}
+                            {Array.from({ length: startOfMonth(currentDate).getDay() }).map((_, index) => (
+                                <div key={`empty-${index}`} className="p-3"></div>
+                            ))}
+
+                            {/* Render days of the month */}
                             {daysInMonth.map((day, index) => {
                                 const dayFormatted = format(day, 'dd/MM/yyyy');
                                 return (
