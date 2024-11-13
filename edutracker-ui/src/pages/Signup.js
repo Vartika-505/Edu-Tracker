@@ -1,9 +1,9 @@
-// src/components/Signup.js
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
-import { AuthContext } from '../context/AuthContext'; // Import AuthContext
+import { AuthContext } from '../context/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Signup = () => {
     const [username, setUsername] = useState('');
@@ -13,19 +13,17 @@ const Signup = () => {
     const navigate = useNavigate();
 
     // Retrieve setToken and other necessary functions from AuthContext
-    const { setToken, setUsername: setGlobalUsername, setUserId } = useContext(AuthContext);
+    const { setToken, setUsername: setGlobalUsername, setUserId, setAuraPoints } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Send signup request
             const response = await axios.post('http://localhost:5000/api/auth/signup', {
                 username,
                 email,
-                password
+                password,
             });
 
-            // Check if token and userId are returned
             if (response.data && response.data.token && response.data.userId) {
                 const { token, userId } = response.data;
 
@@ -37,7 +35,8 @@ const Signup = () => {
                 // Update context with token, username, and userId
                 setToken(token);
                 setGlobalUsername(username);
-                setUserId(userId); // Make sure setUserId is defined in AuthContext
+                setUserId(userId);
+                setAuraPoints(0); // Initialize aura points as 0
 
                 // Redirect to dashboard after successful signup
                 navigate('/dashboard');
@@ -49,20 +48,42 @@ const Signup = () => {
         }
     };
 
+    const handleGoogleSignIn = (response) => {
+        const { credential } = response;
+
+        if (!credential) {
+            console.error("Token ID or Profile object is missing.");
+            return;
+        }
+
+        // Decode the JWT token to get user information
+        const decoded = JSON.parse(atob(credential.split('.')[1]));
+
+        // Store token and profile info in localStorage
+        localStorage.setItem("token", credential);
+        localStorage.setItem("username", decoded.name);
+        localStorage.setItem("userId", decoded.sub);
+
+        // Update context with Google credentials
+        setToken(credential);
+        setGlobalUsername(decoded.name);
+        setUserId(decoded.sub);
+        setAuraPoints(0);
+
+        // Navigate to dashboard
+        navigate('/dashboard');
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Navbar at the top */}
             <Navbar token={null} handleLogout={() => {}} />
 
-            {/* Gradient Background Container */}
             <div className="flex flex-grow bg-gradient-to-br from-purple-600 via-purple-500 to-purple-300">
-                {/* Left Section */}
                 <div className="w-1/2 flex flex-col items-center justify-center p-10 text-white">
                     <h2 className="text-6xl font-bold mb-4">Join Us!</h2>
                     <p className="text-2xl">Create your account to get started.</p>
                 </div>
 
-                {/* Right Section */}
                 <div className="w-1/2 flex flex-col items-center justify-center p-10">
                     <div className="bg-white p-10 rounded-lg shadow-2xl w-full max-w-md">
                         <h2 className="text-3xl font-semibold mb-6 text-center text-purple-600">Sign Up</h2>
@@ -96,6 +117,12 @@ const Signup = () => {
                                 Sign Up
                             </button>
                         </form>
+                        <div className="text-center mt-4">
+                            <GoogleLogin
+                                onSuccess={handleGoogleSignIn}
+                                onError={() => console.log('Google Sign-In Error')}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

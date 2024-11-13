@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { AuthContext } from '../context/AuthContext'; // Import AuthContext
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
     const [usernameInput, setUsernameInput] = useState('');
@@ -13,7 +14,7 @@ const Login = () => {
 
     // Retrieve context functions and variables
     const { token, setToken, setUsername, setUserId, setAuraPoints, handleLogout } = useContext(AuthContext);
-
+    
     useEffect(() => {
         const checkTokenValidity = async () => {
             const token = localStorage.getItem('token');
@@ -75,10 +76,36 @@ const Login = () => {
         }
     };
 
-    const handleGoogleSignIn = () => {
+    const handleGoogleSignIn = (response) => {
         console.log("Google Sign-In clicked");
-    };
+    
+        // Extract token and profile information
+        const { credential } = response;
+        if (!credential) {
+          console.error("Token ID or Profile object is missing.");
+          return;
+        }
+    
+        // Decode the JWT token to get user information
+        const decoded = JSON.parse(atob(credential.split('.')[1]));
+    
+        // Store token and profile info in localStorage
+        localStorage.setItem("token", credential);
+        localStorage.setItem("username", decoded.name);
+        localStorage.setItem("googleProfile", JSON.stringify(decoded));
+        localStorage.setItem("userId", decoded.sub);
+setUserId(decoded.sub);
 
+        // Update individual states
+        setToken(credential);
+        setUsername(decoded.name);
+        setAuraPoints(0);
+    
+        // Navigate to dashboard
+        navigate('/dashboard');
+      };
+    
+    
     return (
         <div className="min-h-screen flex flex-col">
             {/* Navbar at the top */}
@@ -130,9 +157,10 @@ const Login = () => {
                                 <button type="submit" className="bg-purple-400 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-200 w-full mb-4">
                                     Login
                                 </button>
-                                <button onClick={handleGoogleSignIn} type="button" className="bg-white text-purple-600 border border-purple-400 px-4 py-2 rounded-lg w-full hover:bg-purple-100 transition duration-200">
-                                    Sign in with Google
-                                </button>
+                                <GoogleLogin
+        onSuccess={handleGoogleSignIn}
+        onError={() => console.log('Google Sign-In Error')}
+      />
                                 {message && <p className="mt-4 text-red-500 text-center">{message}</p>}
                             </form>
                         )}
