@@ -48,31 +48,64 @@ const Signup = () => {
         }
     };
 
-    const handleGoogleSignIn = (response) => {
+    const handleGoogleSignIn = async (response) => {
         const { credential } = response;
-
         if (!credential) {
             console.error("Token ID or Profile object is missing.");
             return;
         }
+    
+        const decoded = JSON.parse(atob(credential.split('.')[1])); // Decoding the token to extract user info
+        const emailPrefix = decoded.email.split('@')[0];
+        try {
+            const googleSignInResponse = await axios.post('http://localhost:5000/api/auth/googleSign', {
+                token: credential,
+            });
 
-        // Decode the JWT token to get user information
-        const decoded = JSON.parse(atob(credential.split('.')[1]));
-
-        // Store token and profile info in localStorage
-        localStorage.setItem("token", credential);
-        localStorage.setItem("username", decoded.name);
-        localStorage.setItem("userId", decoded.sub);
-
-        // Update context with Google credentials
-        setToken(credential);
-        setGlobalUsername(decoded.name);
-        setUserId(decoded.sub);
-        setAuraPoints(0);
-
-        // Navigate to dashboard
-        navigate('/dashboard');
+            const existingUser = googleSignInResponse.data;
+            if (existingUser) {
+                console.log("User exists:", existingUser);  // Log user data
+                localStorage.setItem('token', existingUser.token);
+                localStorage.setItem('username', emailPrefix);
+                localStorage.setItem('userId', existingUser.userId);
+                localStorage.setItem('auraPoints', existingUser.auraPoints);
+    
+                setToken(existingUser.token);
+                setGlobalUsername(emailPrefix);
+                setUserId(existingUser.userId);
+                setAuraPoints(existingUser.auraPoints);
+    
+                navigate('/dashboard');
+            } else {
+                console.log("User does not exist, creating new user.");
+                // If user does not exist, create a new user
+                const newUserResponse = await axios.post('http://localhost:5000/api/auth/signup', {
+                    email: decoded.email,
+                    username: emailPrefix,
+                    password: 'google-auth', // No password for Google sign-in
+                });
+    
+                const newUser = newUserResponse.data;
+    
+                localStorage.setItem('token', newUser.token);
+                localStorage.setItem('username', emailPrefix);
+                localStorage.setItem('userId', newUser.userId);
+                localStorage.setItem('auraPoints', 0);
+    
+                setToken(newUser.token);
+                setGlobalUsername(emailPrefix);
+                setUserId(newUser.userId);
+                setAuraPoints(0);
+    
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            console.error('Error during Google sign-in:', error);
+        }
     };
+    
+    
+    
 
     return (
         <div className="min-h-screen flex flex-col">

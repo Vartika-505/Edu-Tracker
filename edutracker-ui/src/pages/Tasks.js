@@ -40,7 +40,6 @@ const Tasks = () => {
             console.error("User ID not found");
             return;
         }
-
         const newTask = { userId, name, category, deadline, difficultyLevel };
         try {
             const response = await axios.post('http://localhost:5000/api/tasks', newTask);
