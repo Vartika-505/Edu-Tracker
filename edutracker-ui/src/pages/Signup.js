@@ -56,29 +56,35 @@ const Signup = () => {
         }
     
         const decoded = JSON.parse(atob(credential.split('.')[1])); // Decoding the token to extract user info
-        const emailPrefix = decoded.email.split('@')[0];
+        const emailPrefix = decoded.email.split('@')[0]; // Username derived from the email prefix
+        const googleId = decoded.sub; // The Google ID (unique identifier for the user)
+    
         try {
             const googleSignInResponse = await axios.post('http://localhost:5000/api/auth/googleSign', {
-                token: credential,
+                googleId, // Sending Google ID to backend
+                username: emailPrefix, // Use email prefix as username
+                email: decoded.email, // Send email to backend as well
             });
-
+    
             const existingUser = googleSignInResponse.data;
             if (existingUser) {
-                console.log("User exists:", existingUser);  // Log user data
+                console.log("User exists:", existingUser);
                 localStorage.setItem('token', existingUser.token);
                 localStorage.setItem('username', emailPrefix);
                 localStorage.setItem('userId', existingUser.userId);
+                localStorage.setItem('email', existingUser.email);
                 localStorage.setItem('auraPoints', existingUser.auraPoints);
     
                 setToken(existingUser.token);
                 setGlobalUsername(emailPrefix);
                 setUserId(existingUser.userId);
+                setEmail(existingUser.email);
                 setAuraPoints(existingUser.auraPoints);
     
                 navigate('/dashboard');
             } else {
                 console.log("User does not exist, creating new user.");
-                // If user does not exist, create a new user
+                // If the user does not exist, create a new user
                 const newUserResponse = await axios.post('http://localhost:5000/api/auth/signup', {
                     email: decoded.email,
                     username: emailPrefix,
@@ -90,11 +96,13 @@ const Signup = () => {
                 localStorage.setItem('token', newUser.token);
                 localStorage.setItem('username', emailPrefix);
                 localStorage.setItem('userId', newUser.userId);
+                localStorage.setItem('email', newUser.email);
                 localStorage.setItem('auraPoints', 0);
     
                 setToken(newUser.token);
                 setGlobalUsername(emailPrefix);
                 setUserId(newUser.userId);
+                setEmail(newUser.email);
                 setAuraPoints(0);
     
                 navigate('/dashboard');

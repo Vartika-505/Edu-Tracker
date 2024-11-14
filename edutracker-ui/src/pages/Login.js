@@ -7,6 +7,7 @@ import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
     const [usernameInput, setUsernameInput] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -85,9 +86,12 @@ const Login = () => {
     
         const decoded = JSON.parse(atob(credential.split('.')[1])); // Decoding the token to extract user info
         const emailPrefix = decoded.email.split('@')[0];
+        const googleId = decoded.sub; 
         try {
             const googleSignInResponse = await axios.post('http://localhost:5000/api/auth/googleSign', {
-                token: credential,
+                googleId, // Sending Google ID to backend
+                username: emailPrefix, // Use email prefix as username
+                email: decoded.email, 
             });
 
             const existingUser = googleSignInResponse.data;
@@ -96,12 +100,14 @@ const Login = () => {
                 localStorage.setItem('token', existingUser.token);
                 localStorage.setItem('username', emailPrefix);
                 localStorage.setItem('userId', existingUser.userId);
+                localStorage.setItem('email', existingUser.email);
                 localStorage.setItem('auraPoints', existingUser.auraPoints);
     
                 setToken(existingUser.token);
                 setUsername(emailPrefix);
                 setUserId(existingUser.userId);
                 setAuraPoints(existingUser.auraPoints);
+                setEmail(existingUser.email);
     
                 navigate('/dashboard');
             } else {
@@ -118,11 +124,13 @@ const Login = () => {
                 localStorage.setItem('token', newUser.token);
                 localStorage.setItem('username', emailPrefix);
                 localStorage.setItem('userId', newUser.userId);
+                localStorage.setItem('email', newUser.email);
                 localStorage.setItem('auraPoints', 0);
     
                 setToken(newUser.token);
                 setUsername(emailPrefix);
                 setUserId(newUser.userId);
+                setEmail(newUser.email);
                 setAuraPoints(0);
     
                 navigate('/dashboard');

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Associate task with user
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
     name: { type: String, required: true },
     category: { type: String, enum: ['Lecture Attendance', 'Assignment Completion', 'Academic Goals'], required: true },
     deadline: { type: Date, required: true },

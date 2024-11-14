@@ -36,29 +36,30 @@ const generateToken = (user) => {
     return jwt.sign(payload, secret, options);
 };
 
-// Handle Google Sign-In for existing or new users
 router.post('/googleSign', async (req, res) => {
-    const { googleId, username, email } = req.body; // Expect data from the frontend
+    const { googleId, username, email } = req.body; // Expecting data from frontend
 
     try {
         // Check if the user already exists by their Google ID
         let user = await User.findOne({ googleId });
 
         if (user) {
-            // User exists, return their details
+            // If the user exists, return their details
             return res.status(200).json({
                 token: generateToken(user),
                 userId: user._id,
                 auraPoints: user.auraPoints,
+                username: user.username,
+                email: user.email,
             });
         }
 
         // If the user doesn't exist, create a new user
         const newUser = new User({
-            googleId,
+            googleId, // Storing Google ID to link to the user's Google account
             username,
             email,
-            password: 'google-auth', // No password for Google sign-in
+            password: 'google-auth', // No password needed for Google login
         });
 
         await newUser.save();
@@ -67,6 +68,8 @@ router.post('/googleSign', async (req, res) => {
             token: generateToken(newUser),
             userId: newUser._id,
             auraPoints: newUser.auraPoints || 0,
+            username: newUser.username,
+            email: newUser.email,
         });
     } catch (error) {
         console.error(error);

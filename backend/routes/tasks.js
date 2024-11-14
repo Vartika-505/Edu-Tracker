@@ -46,6 +46,7 @@ router.post('/', async (req, res) => {
 // Mark task as complete and update user aura points
 router.patch('/:taskId/complete', async (req, res) => {
   const { taskId } = req.params;
+  console.log(taskId);
   try {
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: 'Task not found' });
