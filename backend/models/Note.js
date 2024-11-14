@@ -11,8 +11,14 @@ const noteSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    subject: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 50,
+    },
     tags: {
-        type: [String], 
+        type: [String],
         default: [],
     },
     createdAt: {

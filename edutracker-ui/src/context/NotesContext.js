@@ -1,53 +1,59 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
-// Create the context
 const NotesContext = createContext();
 
-// Provider component
 export const NotesProvider = ({ children }) => {
     const [notes, setNotes] = useState([]);
-    const [userId, setUserId] = useState(localStorage.getItem('userId'));  // Ensure userId is stored in localStorage
+    const [userId, setUserId] = useState(localStorage.getItem('userId'));
+    const [selectedSubject, setSelectedSubject] = useState(localStorage.getItem('selectedSubject') || ''); // Persist the subject in localStorage
 
+    // Fetch notes whenever userId or selectedSubject changes
     useEffect(() => {
         const fetchNotes = async () => {
-            if (userId) {
+            if (userId) {  // Fetch notes if userId is available
                 try {
-                    const response = await axios.get(`http://localhost:5000/api/notes?userId=${userId}`);
-                    setNotes(response.data);  // Update notes from API
+                    let url = `http://localhost:5000/api/notes?userId=${userId}`;
+                    if (selectedSubject) {
+                        url += `&subject=${selectedSubject}`;
+                    }
+                    const response = await axios.get(url);
+                    setNotes(response.data);  // Set the fetched notes
                 } catch (error) {
                     console.error('Error fetching notes:', error);
                 }
             }
         };
 
-        if (userId) {
-            fetchNotes();
-        }
-    }, [userId]);  // Re-fetch notes whenever userId changes or on page load
+        fetchNotes(); // Call the fetchNotes function inside useEffect
+    }, [userId, selectedSubject]);  // Dependencies to re-trigger the effect
 
-    // Function to add a new note
+    // Create a new note
     const createNote = async (noteData) => {
         try {
             const response = await axios.post('http://localhost:5000/api/notes', noteData);
-            setNotes((prevNotes) => [...prevNotes, response.data]);  // Update notes state with newly created note
+            setNotes((prevNotes) => [...prevNotes, response.data]);  // Update notes with the newly created one
         } catch (error) {
             console.error('Error creating note:', error);
         }
     };
 
+    // Clear the selected subject on logout
+    const handleLogout = () => {
+        localStorage.removeItem('selectedSubject');  // Remove the subject from localStorage
+        setSelectedSubject('');  // Reset the subject in state
+        setUserId(null);  // Clear userId or reset as necessary
+        localStorage.removeItem('userId');  // Optionally clear userId from localStorage
+    };
+
     return (
-        <NotesContext.Provider value={{ notes, createNote }}>
+        <NotesContext.Provider value={{ notes, createNote, selectedSubject, setSelectedSubject, setUserId, handleLogout }}>
             {children}
         </NotesContext.Provider>
     );
 };
 
-// Custom hook to use notes context
+// Custom hook to use the NotesContext
 export const useNotes = () => {
-    const context = useContext(NotesContext);
-    if (!context) {
-        throw new Error('useNotes must be used within a NotesProvider');
-    }
-    return context;
+    return useContext(NotesContext);
 };

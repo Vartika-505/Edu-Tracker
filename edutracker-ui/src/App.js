@@ -60,8 +60,7 @@ export default function App() {
             <Route path="/about" element={<About />} />
             <Route path="/timer" element={<Timer />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/notes" element={<Notes />} />
-            <Route path="/notes" element={<Notes username={username} />} />  {/* Notes page */}
+            <Route path="/notes" element={<Notes username={username} />} /> {/* Single Notes page route */}
             <Route path="/leaderboard" element={<Leaderboard username={username} />} /> {/* Pass username to Leaderboard */}
             <Route path="/profile" element={
               <Profile
