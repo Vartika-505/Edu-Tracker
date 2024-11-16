@@ -1,0 +1,252 @@
+import React, { useState, useEffect } from 'react';
+import { useNotes } from '../context/NotesContext';
+import Navbar from './Navbar';
+import jsPDF from 'jspdf';
+import { Document, Packer, Paragraph } from 'docx';
+
+const Notes = ({ username }) => {
+    const { notes, createNote, fetchNotes, selectedSubject, setSelectedSubject, updateNote } = useNotes();
+
+    const [newFileContent, setNewFileContent] = useState('');
+    const [newFileName, setNewFileName] = useState('');
+    const [newFileSubject, setNewFileSubject] = useState('');
+    const [subjects, setSubjects] = useState([]); // Store unique subjects
+    const [filteredNotes, setFilteredNotes] = useState([]);
+    const [showTasks, setShowTasks] = useState(false);
+    const [showEditor, setShowEditor] = useState(false);
+    const [editingNote, setEditingNote] = useState(null);
+    const userId = localStorage.getItem('userId');
+
+    // Load selected subject from local storage on initial load
+    useEffect(() => {
+        const savedSubject = localStorage.getItem('selectedSubject');
+        if (savedSubject) {
+            setSelectedSubject(savedSubject);
+        }
+    }, [setSelectedSubject]);
+
+    // Fetch notes when the selected subject or user ID changes
+    useEffect(() => {
+        if (userId) {
+            fetchNotes(); // Fetch notes only when userId is available
+        }
+    }, [userId, fetchNotes]);
+
+    // Update subjects list and filtered notes when notes are fetched or selectedSubject changes
+    useEffect(() => {
+        if (notes.length > 0) {
+            // Extract unique subjects and filter out empty values
+            const uniqueSubjects = [...new Set(notes.map((note) => note.subject).filter((subject) => subject))];
+            setSubjects(uniqueSubjects); // Update subjects list
+        } else {
+            setSubjects([]); // Reset subjects if no notes
+        }
+
+        if (selectedSubject) {
+            const notesForSubject = notes.filter((note) => note.subject === selectedSubject);
+            setFilteredNotes(notesForSubject);
+        } else {
+            setFilteredNotes(notes);
+        }
+    }, [notes, selectedSubject]);
+
+    const handleSubjectChange = (e) => {
+        const subject = e.target.value;
+        setSelectedSubject(subject);
+        localStorage.setItem('selectedSubject', subject);
+
+        if (subject) {
+            const notesForSubject = notes.filter((note) => note.subject === subject);
+            setFilteredNotes(notesForSubject);
+        } else {
+            setFilteredNotes(notes);
+        }
+    };
+
+    const handleAddNote = async () => {
+        if (!newFileContent.trim() || !newFileName.trim() || !newFileSubject.trim()) return;
+        const note = { title: newFileName, content: newFileContent, userId, subject: newFileSubject };
+        await createNote(note);
+        setNewFileContent('');
+        setNewFileName('');
+        setNewFileSubject('');
+        setShowEditor(false);
+    };
+
+    const handleSaveEdit = async () => {
+        if (!newFileContent.trim() || !newFileName.trim()) return;
+        const updatedNote = { ...editingNote, title: newFileName, content: newFileContent, subject: newFileSubject };
+        await updateNote(updatedNote);
+        setEditingNote(null);
+        setNewFileContent('');
+        setNewFileName('');
+        setNewFileSubject('');
+        setShowEditor(false);
+    };
+
+    const handleDownloadFile = async (title, content, format) => {
+        if (format === 'txt') {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${title}.txt`;
+            link.click();
+        } else if (format === 'pdf') {
+            const pdf = new jsPDF();
+            pdf.text(content, 10, 10);
+            pdf.save(`${title}.pdf`);
+        } else if (format === 'word') {
+            const doc = new Document({
+                sections: [
+                    {
+                        children: [new Paragraph(content)],
+                    },
+                ],
+            });
+            const blob = await Packer.toBlob(doc);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${title}.docx`;
+            link.click();
+        }
+    };
+
+    const handleOpenEditor = () => {
+        setShowEditor(true);
+        setEditingNote(null);
+        setNewFileContent('');
+        setNewFileName('');
+        setNewFileSubject('');
+    };
+
+    const handleEditFile = (note) => {
+        setEditingNote(note);
+        setNewFileName(note.title);
+        setNewFileContent(note.content);
+        setNewFileSubject(note.subject);
+        setShowEditor(true);
+    };
+
+    return (
+        <>
+            <Navbar />
+            <div className="mt-[10vw] px-4">
+                <h2>Notes for {username}</h2>
+
+                <div className="buttons flex gap-4 my-4">
+                    <button
+                        onClick={handleOpenEditor}
+                        className="bg-green-500 text-white px-4 py-2 rounded"
+                    >
+                        Create File
+                    </button>
+                    <button
+                        onClick={() => setShowTasks(!showTasks)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                    >
+                        {showTasks ? 'Hide Files' : 'View Files'}
+                    </button>
+                </div>
+
+                {showEditor && (
+                    <div className="note-editor bg-gray-100 p-4 rounded shadow mb-4">
+                        <input
+                            type="text"
+                            value={newFileName}
+                            onChange={(e) => setNewFileName(e.target.value)}
+                            placeholder="File Title"
+                            className="w-full p-2 mb-2 border rounded"
+                        />
+                        <textarea
+                            value={newFileContent}
+                            onChange={(e) => setNewFileContent(e.target.value)}
+                            placeholder="File Content"
+                            className="w-full p-2 mb-2 border rounded"
+                        />
+                        <input
+                            type="text"
+                            value={newFileSubject}
+                            onChange={(e) => setNewFileSubject(e.target.value)}
+                            placeholder="Enter Subject (or select from the list)"
+                            className="w-full p-2 mb-2 border rounded"
+                        />
+                        <button
+                            onClick={editingNote ? handleSaveEdit : handleAddNote}
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                            {editingNote ? 'Save Edit' : 'Add File'}
+                        </button>
+                    </div>
+                )}
+
+                <div className="my-4">
+                    <select
+                        value={selectedSubject || ''}
+                        onChange={handleSubjectChange}
+                        className="p-2 border rounded w-full mb-4"
+                    >
+                        <option value="">Select Subject</option>
+                        {subjects && subjects.length > 0 ? (
+                            subjects.map((subject, index) => (
+                                <option key={index} value={subject}>
+                                    {subject}
+                                </option>
+                            ))
+                        ) : (
+                            <option disabled>No Subjects Available</option>
+                        )}
+                    </select>
+                </div>
+
+                {showTasks && (
+                    <div>
+                        <h3>All Files</h3>
+                        {filteredNotes.length === 0 ? (
+                            <p>No files available for this subject.</p>
+                        ) : (
+                            filteredNotes.map((note) => (
+                                <div key={note._id} className="task bg-white p-4 mb-2 rounded shadow">
+                                    <h4
+                                        className="text-lg font-semibold cursor-pointer"
+                                        onClick={() => window.open().document.write(note.content)}
+                                    >
+                                        {note.title}.txt
+                                    </h4>
+                                    <div className="download-options flex gap-2 mt-2">
+                                        <button
+                                            onClick={() => handleDownloadFile(note.title, note.content, 'txt')}
+                                            className="bg-yellow-500 text-white px-4 py-2 rounded"
+                                        >
+                                            Download as TXT
+                                        </button>
+                                        <button
+                                            onClick={() => handleDownloadFile(note.title, note.content, 'pdf')}
+                                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                                        >
+                                            Download as PDF
+                                        </button>
+                                        <button
+                                            onClick={() => handleDownloadFile(note.title, note.content, 'word')}
+                                            className="bg-green-500 text-white px-4 py-2 rounded"
+                                        >
+                                            Download as Word
+                                        </button>
+                                    </div>
+                                    <button
+                                        onClick={() => handleEditFile(note)}
+                                        className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+                                    >
+                                        Edit
+                                    </button>
+                                    <small>{new Date(note.createdAt).toLocaleString()}</small>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+            </div>
+        </>
+    );
+};
+
+export default Notes;

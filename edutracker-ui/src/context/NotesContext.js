@@ -8,7 +8,7 @@ export const NotesProvider = ({ children }) => {
     const [userId, setUserId] = useState(localStorage.getItem('userId'));
     const [selectedSubject, setSelectedSubject] = useState(localStorage.getItem('selectedSubject') || '');
 
-    // Define fetchNotes as a function here
+    // Fetch notes based on userId and selectedSubject
     const fetchNotes = async () => {
         if (userId) {
             try {
@@ -24,11 +24,12 @@ export const NotesProvider = ({ children }) => {
         }
     };
 
-    // Fetch notes whenever userId or selectedSubject changes
+    // Fetch notes when userId or selectedSubject changes
     useEffect(() => {
-        fetchNotes(); // Call fetchNotes here
+        fetchNotes();
     }, [userId, selectedSubject]);
 
+    // Create a new note
     const createNote = async (noteData) => {
         try {
             const response = await axios.post('http://localhost:5000/api/notes', noteData);
@@ -38,6 +39,21 @@ export const NotesProvider = ({ children }) => {
         }
     };
 
+    // Update an existing note
+    const updateNote = async (updatedNote) => {
+        try {
+            const response = await axios.put(`http://localhost:5000/api/notes/${updatedNote._id}`, updatedNote);
+            setNotes((prevNotes) =>
+                prevNotes.map((note) =>
+                    note._id === updatedNote._id ? response.data : note
+                )
+            );
+        } catch (error) {
+            console.error('Error updating note:', error);
+        }
+    };
+
+    // Handle user logout
     const handleLogout = () => {
         localStorage.removeItem('selectedSubject');
         setSelectedSubject('');
@@ -46,7 +62,7 @@ export const NotesProvider = ({ children }) => {
     };
 
     return (
-        <NotesContext.Provider value={{ notes, createNote, fetchNotes, selectedSubject, setSelectedSubject, setUserId, handleLogout }}>
+        <NotesContext.Provider value={{ notes, createNote, updateNote, fetchNotes, selectedSubject, setSelectedSubject, setUserId, handleLogout }}>
             {children}
         </NotesContext.Provider>
     );

@@ -58,7 +58,7 @@ export const updateNote = async (req, res) => {
         res.status(500).json({ message: 'Error updating note', error: err.message });
     }
 };
-
+router.get('/unique-subjects', getUserUniqueSubjects);
 // Delete a note by ID
 export const deleteNote = async (req, res) => {
     try {

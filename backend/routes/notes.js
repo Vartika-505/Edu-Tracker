@@ -106,5 +106,20 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ message: 'Error deleting note', error: error.message });
     }
 });
+export const getUserUniqueSubjects = async (req, res) => {
+    const userId = req.user._id; // Assuming `req.user._id` is populated by authentication middleware (like JWT or session)
 
+    if (!userId) {
+        return res.status(400).json({ error: 'User is not authenticated' });
+    }
+
+    try {
+        // Use the MongoDB `distinct` method to get unique subjects for the logged-in user
+        const subjects = await Note.find({ userId }).distinct('subject');
+        res.status(200).json(subjects);
+    } catch (error) {
+        console.error('Error fetching unique subjects:', error);
+        res.status(500).json({ error: 'Error fetching unique subjects' });
+    }
+};
 export default router;
