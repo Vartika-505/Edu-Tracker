@@ -3,9 +3,11 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { AuthContext } from '../context/AuthContext'; // Import AuthContext
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
     const [usernameInput, setUsernameInput] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -13,7 +15,7 @@ const Login = () => {
 
     // Retrieve context functions and variables
     const { token, setToken, setUsername, setUserId, setAuraPoints, handleLogout } = useContext(AuthContext);
-
+    
     useEffect(() => {
         const checkTokenValidity = async () => {
             const token = localStorage.getItem('token');
@@ -75,10 +77,73 @@ const Login = () => {
         }
     };
 
-    const handleGoogleSignIn = () => {
-        console.log("Google Sign-In clicked");
-    };
+     const handleGoogleSignIn = async (response) => {
+        const { credential } = response;
+        if (!credential) {
+            console.error("Token ID or Profile object is missing.");
+            return;
+        }
+    
+        const decoded = JSON.parse(atob(credential.split('.')[1])); // Decoding the token to extract user info
+        const emailPrefix = decoded.email.split('@')[0];
+        const googleId = decoded.sub; 
+        try {
+            const googleSignInResponse = await axios.post('http://localhost:5000/api/auth/googleSign', {
+                googleId, // Sending Google ID to backend
+                username: emailPrefix, // Use email prefix as username
+                email: decoded.email, 
+            });
 
+            const existingUser = googleSignInResponse.data;
+            if (existingUser) {
+                console.log("User exists:", existingUser);  // Log user data
+                localStorage.setItem('token', existingUser.token);
+                localStorage.setItem('username', emailPrefix);
+                localStorage.setItem('userId', existingUser.userId);
+                localStorage.setItem('email', existingUser.email);
+                localStorage.setItem('auraPoints', existingUser.auraPoints);
+    
+                setToken(existingUser.token);
+                setUsername(emailPrefix);
+                setUserId(existingUser.userId);
+                setAuraPoints(existingUser.auraPoints);
+                setEmail(existingUser.email);
+    
+                navigate('/dashboard');
+            } else {
+                console.log("User does not exist, creating new user.");
+                // If user does not exist, create a new user
+                const newUserResponse = await axios.post('http://localhost:5000/api/auth/signup', {
+                    email: decoded.email,
+                    username: emailPrefix,
+                    password: 'google-auth', // No password for Google sign-in
+                });
+    
+                const newUser = newUserResponse.data;
+    
+                localStorage.setItem('token', newUser.token);
+                localStorage.setItem('username', emailPrefix);
+                localStorage.setItem('userId', newUser.userId);
+                localStorage.setItem('email', newUser.email);
+                localStorage.setItem('auraPoints', 0);
+    
+                setToken(newUser.token);
+                setUsername(emailPrefix);
+                setUserId(newUser.userId);
+                setEmail(newUser.email);
+                setAuraPoints(0);
+    
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            console.error('Error during Google sign-in:', error);
+        }
+    };
+    
+    
+    
+    
+    
     return (
         <div className="min-h-screen flex flex-col">
             {/* Navbar at the top */}
@@ -130,9 +195,10 @@ const Login = () => {
                                 <button type="submit" className="bg-purple-400 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-200 w-full mb-4">
                                     Login
                                 </button>
-                                <button onClick={handleGoogleSignIn} type="button" className="bg-white text-purple-600 border border-purple-400 px-4 py-2 rounded-lg w-full hover:bg-purple-100 transition duration-200">
-                                    Sign in with Google
-                                </button>
+                                <GoogleLogin
+        onSuccess={handleGoogleSignIn}
+        onError={() => console.log('Google Sign-In Error')}
+      />
                                 {message && <p className="mt-4 text-red-500 text-center">{message}</p>}
                             </form>
                         )}

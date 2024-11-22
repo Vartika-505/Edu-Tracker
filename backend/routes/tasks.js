@@ -46,22 +46,30 @@ router.post('/', async (req, res) => {
 // Mark task as complete and update user aura points
 router.patch('/:taskId/complete', async (req, res) => {
   const { taskId } = req.params;
+  console.log(taskId);
   try {
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: 'Task not found' });
     if (task.completed) return res.status(400).json({ message: 'Task already completed' });
-
+    
+    console.log("Task found:", task);
+    
     task.completed = true;
     await task.save();
-
+    
     const user = await User.findById(task.userId);
-    user.auraPoints += task.difficultyLevel; // Add aura points based on task difficulty
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    console.log("User found:", user);
+    user.auraPoints += task.difficultyLevel;
     await user.save();
-
+    
     res.json({ task, auraPoints: user.auraPoints });
   } catch (error) {
+    console.error("Error completing task:", error);
     res.status(500).json({ message: 'Error completing task', error });
   }
 });
+
 
 export default router;

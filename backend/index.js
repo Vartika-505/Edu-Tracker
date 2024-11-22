@@ -6,6 +6,8 @@ import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/tasks.js';
 import leaderboardRoutes from './routes/leaderboard.js';
 import notesRoutes from './routes/notes.js';  // Import the notes routes
+import passport from './config/passport.js';
+import session from 'express-session';
 
 dotenv.config();
 
@@ -22,12 +24,24 @@ connectDB().then(() => {
         console.log(`Server running on port ${PORT}`);
     });
 });
+app.use('/api/leaderboard', leaderboardRoutes);
+// Routes
 
-// Register routes
-app.use('/api/auth', authRoutes);
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if using https
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use('/api/auth', authRoutes); // Use the auth routes for signup/login
 app.use('/api/tasks', taskRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/notes', notesRoutes);  // Make sure this line is correct
+
+
 
 // Test route (optional)
 app.get('/', (req, res) => {
