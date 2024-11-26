@@ -13,7 +13,7 @@ const Signup = () => {
     const navigate = useNavigate();
 
     // Retrieve setToken and other necessary functions from AuthContext
-    const { setToken, setUsername: setGlobalUsername, setUserId, setAuraPoints } = useContext(AuthContext);
+    const { setToken, setUsername: setGlobalUsername, setUserId, setAuraPoints, setEmail: setGlobalEmail } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -37,6 +37,7 @@ const Signup = () => {
                 setGlobalUsername(username);
                 setUserId(userId);
                 setAuraPoints(0); // Initialize aura points as 0
+                setGlobalEmail(email); // Set email globally in context
 
                 // Redirect to dashboard after successful signup
                 navigate('/dashboard');
@@ -54,18 +55,18 @@ const Signup = () => {
             console.error("Token ID or Profile object is missing.");
             return;
         }
-    
+
         const decoded = JSON.parse(atob(credential.split('.')[1])); // Decoding the token to extract user info
         const emailPrefix = decoded.email.split('@')[0]; // Username derived from the email prefix
         const googleId = decoded.sub; // The Google ID (unique identifier for the user)
-    
+
         try {
             const googleSignInResponse = await axios.post('http://localhost:5000/api/auth/googleSign', {
                 googleId, // Sending Google ID to backend
                 username: emailPrefix, // Use email prefix as username
                 email: decoded.email, // Send email to backend as well
             });
-    
+
             const existingUser = googleSignInResponse.data;
             if (existingUser) {
                 console.log("User exists:", existingUser);
@@ -74,13 +75,13 @@ const Signup = () => {
                 localStorage.setItem('userId', existingUser.userId);
                 localStorage.setItem('email', existingUser.email);
                 localStorage.setItem('auraPoints', existingUser.auraPoints);
-    
+
                 setToken(existingUser.token);
                 setGlobalUsername(emailPrefix);
                 setUserId(existingUser.userId);
-                setEmail(existingUser.email);
+                setGlobalEmail(existingUser.email);  // Set email from Google sign-in
                 setAuraPoints(existingUser.auraPoints);
-    
+
                 navigate('/dashboard');
             } else {
                 console.log("User does not exist, creating new user.");
@@ -90,30 +91,27 @@ const Signup = () => {
                     username: emailPrefix,
                     password: 'google-auth', // No password for Google sign-in
                 });
-    
+
                 const newUser = newUserResponse.data;
-    
+
                 localStorage.setItem('token', newUser.token);
                 localStorage.setItem('username', emailPrefix);
                 localStorage.setItem('userId', newUser.userId);
                 localStorage.setItem('email', newUser.email);
                 localStorage.setItem('auraPoints', 0);
-    
+
                 setToken(newUser.token);
                 setGlobalUsername(emailPrefix);
                 setUserId(newUser.userId);
-                setEmail(newUser.email);
+                setGlobalEmail(newUser.email);  // Set email from new user
                 setAuraPoints(0);
-    
+
                 navigate('/dashboard');
             }
         } catch (error) {
             console.error('Error during Google sign-in:', error);
         }
     };
-    
-    
-    
 
     return (
         <div className="min-h-screen flex flex-col">

@@ -24,6 +24,7 @@ export default function App() {
   const [totalTasks, setTotalTasks] = useState(parseInt(localStorage.getItem('totalTasks'), 10) || 0);
   const [completedTasks, setCompletedTasks] = useState(parseInt(localStorage.getItem('completedTasks'), 10) || 0);
 
+  // Persist state changes in localStorage
   useEffect(() => {
     localStorage.setItem('token', token);
     localStorage.setItem('username', username);
@@ -33,6 +34,7 @@ export default function App() {
     localStorage.setItem('completedTasks', completedTasks);
   }, [token, username, email, auraPoints, totalTasks, completedTasks]);
 
+  // Handle logout by clearing localStorage and state
   const handleLogout = () => {
     localStorage.clear();
     setToken('');
@@ -44,40 +46,78 @@ export default function App() {
   };
 
   return (
-
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>\
-    <NotesProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/home" element={<Home token={token} username={username} auraPoints={auraPoints} handleLogout={handleLogout} />} />
-            <Route path="/dashboard" element={<Dashboard token={token} username={username} auraPoints={auraPoints} setAuraPoints={setAuraPoints} handleLogout={handleLogout} />} />
-            <Route path="/tasks" element={<Tasks token={token} username={username} setAuraPoints={setAuraPoints} handleLogout={handleLogout}/>} />
-            <Route path="/login" element={<Login setToken={setToken} setUsername={setUsername} setAuraPoints={setAuraPoints} />} />
-            <Route path="/" element={<Home token={token} username={username} />} />
-            <Route path="/timetable" element={<Timetable token={token} username={username} handleLogout={handleLogout} />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/timer" element={<Timer />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/notes" element={<Notes username={username} />} /> {/* Single Notes page route */}
-            <Route path="/leaderboard" element={<Leaderboard username={username} />} /> {/* Pass username to Leaderboard */}
-            <Route path="/profile" element={
-              <Profile
-                token={token}
-                username={username}
-                email={email}
-                auraPoints={auraPoints}
-                totalTasks={totalTasks}
-                completedTasks={completedTasks}
-                handleLogout={handleLogout}
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+      <NotesProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Define routes with necessary props for each component */}
+              <Route 
+                path="/home" 
+                element={<Home token={token} username={username} auraPoints={auraPoints} handleLogout={handleLogout} />} 
               />
-            } />
-          </Routes>
-        </BrowserRouter>
-   
-    </AuthProvider>
-    </NotesProvider>
+              <Route 
+                path="/dashboard" 
+                element={<Dashboard token={token} username={username} auraPoints={auraPoints} setAuraPoints={setAuraPoints} handleLogout={handleLogout} />} 
+              />
+              <Route 
+                path="/tasks" 
+                element={<Tasks token={token} username={username} setAuraPoints={setAuraPoints} handleLogout={handleLogout}/>} 
+              />
+              <Route 
+                path="/login" 
+                element={<Login setToken={setToken} setUsername={setUsername} setAuraPoints={setAuraPoints} />} 
+              />
+              <Route 
+                path="/" 
+                element={<Home token={token} username={username} />} 
+              />
+              <Route 
+                path="/timetable" 
+                element={<Timetable token={token} username={username} handleLogout={handleLogout} />} 
+              />
+              <Route 
+                path="/signup" 
+                element={<Signup />} 
+              />
+              <Route 
+                path="/about" 
+                element={<About />} 
+              />
+              <Route 
+                path="/timer" 
+                element={<Timer />} 
+              />
+              <Route 
+                path="/contact" 
+                element={<Contact />} 
+              />
+              <Route 
+                path="/notes" 
+                element={<Notes username={username} />} 
+              />
+              <Route 
+                path="/leaderboard" 
+                element={<Leaderboard username={username} />} 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <Profile
+                    token={token}
+                    username={username}
+                    email={email}
+                    auraPoints={auraPoints}
+                    totalTasks={totalTasks}
+                    completedTasks={completedTasks}
+                    handleLogout={handleLogout}
+                  />
+                } 
+              />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </NotesProvider>
     </GoogleOAuthProvider>
   );
 }
