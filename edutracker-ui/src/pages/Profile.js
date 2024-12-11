@@ -106,35 +106,58 @@ const Profile = () => {
 
             <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md text-center mt-10">
                 <header className="flex flex-col items-center mb-10">
-                    <h1 className="text--4xl font-bold text-purple-800">Hello, {username}!</h1>
+                    <h1 className="text-4xl font-bold text-purple-800">Hello, {username}!</h1>
                     <p className="text-lg text-gray-500 mt-2">Welcome to your profile dashboard.</p>
                 </header>
 
                 <div className="flex flex-col items-center mb-6">
                     {profilePic ? (
-                        <img src={profilePic} alt="Profile" className="w-32 h-32 rounded-full mb-4" />
-                    ) : (
-                        <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center mb-4 text-gray-500">
-                            No Image
+                        <div>
+                            <img src={profilePic} alt="Profile" className="w-32 h-32 rounded-full mb-4" />
+                            <div className="flex space-x-4">
+                        
+                        <label className="bg-purple-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-purple-700 transition">
+                            Change Profile
+                            <input
+                                type="file"
+                                onChange={handleProfilePicUpload}
+                                className="hidden"
+                                accept="image/*"
+                            />
+                        </label>
+                        {profilePic && (
+                            <button
+                                onClick={handleRemoveProfilePic}
+                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+                            >
+                                Remove Profile
+                            </button>
+                        )}
+                    </div>
                         </div>
+                        
+                    ) : (
+                        <div>
+                            <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center mb-4 text-gray-500">
+                            No Image
+                             </div>
+                             <div className="flex space-x-4">
+                        <label className="bg-purple-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-purple-700 transition">
+                            Upload Profile
+                            <input
+                                type="file"
+                                onChange={handleProfilePicUpload}
+                                className="hidden"
+                                accept="image/*"
+                            />
+                        </label>
+                    </div>
+                        </div>
+                        
+                        
                     )}
-                    <label className="bg-purple-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-purple-700 transition">
-                        Upload Picture
-                        <input
-                            type="file"
-                            onChange={handleProfilePicUpload}
-                            className="hidden"
-                            accept="image/*"
-                        />
-                    </label>
-                    {profilePic && (
-                        <button
-                            onClick={handleRemoveProfilePic}
-                            className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
-                        >
-                            Remove Picture
-                        </button>
-                    )}
+                    
+                   
                 </div>
 
                 <div className="bg-purple-100 p-4 rounded-lg text-left w-full mt-4">
