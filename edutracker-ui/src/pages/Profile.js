@@ -8,13 +8,16 @@ const Profile = () => {
     const [profilePic, setProfilePic] = useState(null);
     const [totalTasks, setTotalTasks] = useState(0);
     const [completedTasks, setCompletedTasks] = useState(0);
-    const [imageUrl, setImageUrl] = useState(''); 
     const navigate = useNavigate();
 
     useEffect(() => {
         if (!token) {
             navigate('/home');
         } else {
+            const savedProfilePic = localStorage.getItem('profilePicture');
+            if (savedProfilePic) {
+                setProfilePic(savedProfilePic);
+            }
             fetchTaskSummary();
         }
     }, [token, navigate]);
@@ -36,10 +39,60 @@ const Profile = () => {
         }
     };
 
-    const handleProfilePicUpload = (event) => {
-        const url = event.target.value;
-        setImageUrl(url); 
-        setProfilePic(url); // Set profile pic to the provided URL
+    const handleProfilePicUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        try {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                navigate('/login');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('profilePicture', file);
+
+            const response = await fetch(`http://localhost:5000/api/auth/uploadProfilePicture/${userId}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            if (!response.ok) throw new Error('Failed to upload profile picture');
+            const data = await response.json();
+            setProfilePic(data.profilePicture);
+            localStorage.setItem('profilePicture', data.profilePicture);
+            console.log('Profile picture updated successfully:', data.message);
+        } catch (error) {
+            console.error('Error uploading profile picture:', error);
+        }
+    };
+
+    const handleRemoveProfilePic = async () => {
+        try {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                navigate('/login');
+                return;
+            }
+
+            const response = await fetch(`http://localhost:5000/api/auth/removeProfilePicture/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) throw new Error('Failed to remove profile picture');
+            setProfilePic(null);
+            localStorage.removeItem('profilePicture');
+            console.log('Profile picture removed successfully');
+        } catch (error) {
+            console.error('Error removing profile picture:', error);
+        }
     };
 
     const handleLogout = () => {
@@ -53,7 +106,7 @@ const Profile = () => {
 
             <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md text-center mt-10">
                 <header className="flex flex-col items-center mb-10">
-                    <h1 className="text-4xl font-bold text-purple-800">Hello, {username}!</h1>
+                    <h1 className="text--4xl font-bold text-purple-800">Hello, {username}!</h1>
                     <p className="text-lg text-gray-500 mt-2">Welcome to your profile dashboard.</p>
                 </header>
 
@@ -71,19 +124,17 @@ const Profile = () => {
                             type="file"
                             onChange={handleProfilePicUpload}
                             className="hidden"
+                            accept="image/*"
                         />
                     </label>
-
-                    {/* Input for URL to upload profile picture */}
-                    <div className="mt-4">
-                        <input
-                            type="text"
-                            value={imageUrl}
-                            onChange={handleProfilePicUpload}
-                            placeholder="Enter image URL"
-                            className="px-4 py-2 rounded-md border border-purple-300"
-                        />
-                    </div>
+                    {profilePic && (
+                        <button
+                            onClick={handleRemoveProfilePic}
+                            className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+                        >
+                            Remove Picture
+                        </button>
+                    )}
                 </div>
 
                 <div className="bg-purple-100 p-4 rounded-lg text-left w-full mt-4">

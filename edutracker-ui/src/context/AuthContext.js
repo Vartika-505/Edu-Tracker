@@ -11,8 +11,8 @@ export const AuthProvider = ({ children }) => {
     const [auraPoints, setAuraPoints] = useState(parseInt(localStorage.getItem('auraPoints')) || 0);
     const [totalTasks, setTotalTasks] = useState(parseInt(localStorage.getItem('totalTasks')) || 0);
     const [completedTasks, setCompletedTasks] = useState(parseInt(localStorage.getItem('completedTasks')) || 0);
-    const [userId, setUserId] = useState(localStorage.getItem('userId') || ''); // Add userId state
-   
+    const [userId, setUserId] = useState(localStorage.getItem('userId') || ''); 
+    const [profilePic, setProfilePic] = useState('');
     // Sync the states with localStorage whenever they change
     useEffect(() => {
         localStorage.setItem('token', token);
@@ -21,8 +21,9 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('auraPoints', auraPoints);
         localStorage.setItem('totalTasks', totalTasks);
         localStorage.setItem('completedTasks', completedTasks);
-        localStorage.setItem('userId', userId); // Sync userId with localStorage
-    }, [token, username, email, auraPoints, totalTasks, completedTasks, userId]);
+        localStorage.setItem('userId', userId); 
+        localStorage.setItem('profilePicture', profilePic); 
+    }, [token, username, email, auraPoints, totalTasks, completedTasks, userId,profilePic]);
 
     // Logout handler to clear all data
     const handleLogout = () => {
@@ -33,7 +34,8 @@ export const AuthProvider = ({ children }) => {
         setAuraPoints(0);
         setTotalTasks(0);
         setCompletedTasks(0);
-        setUserId(''); // Clear userId
+        setUserId('');
+        setProfilePic('');
     };
 
     return (
@@ -44,7 +46,9 @@ export const AuthProvider = ({ children }) => {
             auraPoints, setAuraPoints, 
             totalTasks, setTotalTasks, 
             completedTasks, setCompletedTasks, 
-            userId, setUserId, // Provide userId and setUserId in context
+            userId, setUserId,
+            profilePic,
+                setProfilePic,
             handleLogout 
         }}>
             {children}

@@ -23,6 +23,7 @@ export default function App() {
   const [auraPoints, setAuraPoints] = useState(parseInt(localStorage.getItem('auraPoints'), 10) || 0);
   const [totalTasks, setTotalTasks] = useState(parseInt(localStorage.getItem('totalTasks'), 10) || 0);
   const [completedTasks, setCompletedTasks] = useState(parseInt(localStorage.getItem('completedTasks'), 10) || 0);
+  const [profilePic, setProfilePic] = useState(localStorage.getItem('profilePicture') || '');
 
   // Persist state changes in localStorage
   useEffect(() => {
@@ -32,7 +33,8 @@ export default function App() {
     localStorage.setItem('auraPoints', auraPoints);
     localStorage.setItem('totalTasks', totalTasks);
     localStorage.setItem('completedTasks', completedTasks);
-  }, [token, username, email, auraPoints, totalTasks, completedTasks]);
+    localStorage.setItem('profilePicture', profilePic);
+  }, [token, username, email, auraPoints, totalTasks, completedTasks,profilePic]);
 
   // Handle logout by clearing localStorage and state
   const handleLogout = () => {
@@ -43,6 +45,7 @@ export default function App() {
     setAuraPoints(0);
     setTotalTasks(0);
     setCompletedTasks(0);
+    setProfilePic('');
   };
 
   return (
@@ -66,7 +69,7 @@ export default function App() {
               />
               <Route 
                 path="/login" 
-                element={<Login setToken={setToken} setUsername={setUsername} setAuraPoints={setAuraPoints} />} 
+                element={<Login setToken={setToken} setUsername={setUsername} setAuraPoints={setAuraPoints} setProfilePic={setProfilePic}/>} 
               />
               <Route 
                 path="/" 
@@ -110,6 +113,7 @@ export default function App() {
                     auraPoints={auraPoints}
                     totalTasks={totalTasks}
                     completedTasks={completedTasks}
+                    profilePic={profilePic}
                     handleLogout={handleLogout}
                   />
                 } 

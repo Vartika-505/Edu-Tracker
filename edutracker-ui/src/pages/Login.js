@@ -14,7 +14,7 @@ const Login = () => {
     const navigate = useNavigate();
 
     // Retrieve context functions and variables
-    const { token, setToken, setUsername, setUserId, setAuraPoints, handleLogout } = useContext(AuthContext);
+    const { token, setToken, setUsername, setUserId, setAuraPoints, handleLogout,setProfilePic } = useContext(AuthContext);
     
     useEffect(() => {
         const checkTokenValidity = async () => {
@@ -33,6 +33,7 @@ const Login = () => {
                     setUsername(localUsername);
                     setAuraPoints(Number(storedAuraPoints));
                     setUserId(storedUserId);  // Set userId from localStorage to context
+                    setProfilePic(localStorage.getItem('profilePicture'));
                 } catch (error) {
                     console.log("Token validation failed, logging out.");
                     handleLogout(); // Call handleLogout from context to clear session
@@ -41,7 +42,7 @@ const Login = () => {
             }
         };
         checkTokenValidity();
-    }, [setUsername, setAuraPoints, setUserId, handleLogout]);
+    }, [setUsername, setAuraPoints, setUserId, handleLogout,setProfilePic]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,20 +51,28 @@ const Login = () => {
                 username: usernameInput,
                 password,
             });
-
-            const { token, auraPoints, userId } = response.data;
-
-            // Store token and user details in local storage
-            localStorage.setItem('userId', userId);   // Store userId in localStorage
+    
+            const { token, auraPoints, userId, profilePicture } = response.data;
+    
+            // Store details in local storage
             localStorage.setItem('token', token);
             localStorage.setItem('auraPoints', auraPoints);
-
-            // Update context with token, username, auraPoints, and userId
-            setToken(token);            // Update context with token
-            setUsername(usernameInput);  // Update context with username
-            setUserId(userId);           // Update context with userId
-            setAuraPoints(auraPoints);   // Update context with aura points
-
+            localStorage.setItem('userId', userId);
+    
+            if (profilePicture) {
+                localStorage.setItem('profilePicture', profilePicture);
+                setProfilePic(profilePicture); // Update context
+            } else {
+                localStorage.removeItem('profilePicture');
+                setProfilePic(null); // Clear profile picture in context if not available
+            }
+    
+            // Update context
+            setToken(token);
+            setUsername(usernameInput);
+            setUserId(userId);
+            setAuraPoints(auraPoints);
+    
             setMessage('Login successful!');
             setUsernameInput('');
             setPassword('');
@@ -76,7 +85,7 @@ const Login = () => {
             );
         }
     };
-
+    
      const handleGoogleSignIn = async (response) => {
         const { credential } = response;
         if (!credential) {
@@ -102,7 +111,11 @@ const Login = () => {
                 localStorage.setItem('userId', existingUser.userId);
                 localStorage.setItem('email', existingUser.email);
                 localStorage.setItem('auraPoints', existingUser.auraPoints);
-    
+                
+                if (existingUser.profilePicture) {
+                    localStorage.setItem('profilePicture', existingUser.profilePicture);
+                    setProfilePic(existingUser.profilePicture);
+                }
                 setToken(existingUser.token);
                 setUsername(emailPrefix);
                 setUserId(existingUser.userId);
@@ -126,7 +139,11 @@ const Login = () => {
                 localStorage.setItem('userId', newUser.userId);
                 localStorage.setItem('email', newUser.email);
                 localStorage.setItem('auraPoints', 0);
-    
+
+                if (existingUser.profilePicture) {
+                    localStorage.setItem('profilePicture', existingUser.profilePicture);
+                    setProfilePic(existingUser.profilePicture);
+                }
                 setToken(newUser.token);
                 setUsername(emailPrefix);
                 setUserId(newUser.userId);

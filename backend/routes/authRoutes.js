@@ -1,9 +1,11 @@
-// routes/authRoutes.js
 import express from 'express';
 import { registerUser, loginUser } from '../controllers/authController.js';
 import passport from '../config/passport.js'; 
 import jwt from 'jsonwebtoken';
-import User from '../models/User.js'; // Ensure you have the correct path to your User model
+import User from '../models/User.js'; 
+import { upload } from '../config/cloudinary.js';
+import cloudinary from 'cloudinary'; 
+
 const router = express.Router();
 
 // Existing routes
@@ -29,8 +31,8 @@ router.get('/google/callback',
 
 // Token generation function
 const generateToken = (user) => {
-    const payload = { userId: user._id, username: user.username }; // Example payload
-    const secret = process.env.JWT_SECRET; // Ensure your secret is in .env
+    const payload = { userId: user._id, username: user.username };
+    const secret = process.env.JWT_SECRET; 
     const options = { expiresIn: '1h' }; // Optional: Set expiration for the token
 
     return jwt.sign(payload, secret, options);
@@ -51,6 +53,7 @@ router.post('/googleSign', async (req, res) => {
                 auraPoints: user.auraPoints,
                 username: user.username,
                 email: user.email,
+                profilePicture: user.profilePicture || null,
             });
         }
 
@@ -70,10 +73,71 @@ router.post('/googleSign', async (req, res) => {
             auraPoints: newUser.auraPoints || 0,
             username: newUser.username,
             email: newUser.email,
+            profilePicture: newUser.profilePicture || null,
         });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+// Upload Profile Picture to Cloudinary and Save URL
+router.post('/uploadProfilePicture/:userId', upload.single('profilePicture'), async (req, res) => {
+    try {
+      const { userId } = req.params;
+
+      // Check if the file is uploaded
+      if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+
+      // Upload image to Cloudinary
+      cloudinary.v2.uploader.upload_stream({
+        folder: 'profile_pictures',
+      }, async (error, result) => {
+        if (error) return res.status(500).json({ message: 'Cloudinary upload failed', error });
+
+        // Save the Cloudinary image URL to the user's profile
+        const updatedUser = await User.findByIdAndUpdate(userId, { profilePicture: result.secure_url }, { new: true });
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Return response with the updated user and profile picture URL
+        res.status(200).json({ message: 'Profile picture updated', profilePicture: result.secure_url });
+      }).end(req.file.buffer);
+    } catch (error) {
+        console.error('Error uploading profile picture:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// DELETE route to remove profile picture
+router.delete('/removeProfilePicture/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (user.profilePicture) {
+            // If there is a profile picture, delete it from Cloudinary
+            const publicId = user.profilePicture.split('/').pop().split('.')[0]; // Extract the public ID from the URL
+
+            await cloudinary.v2.uploader.destroy(publicId); // Remove image from Cloudinary
+
+            console.log(`Image with public ID ${publicId} deleted from Cloudinary.`);
+        }
+
+        // Remove profile picture reference from the user's record
+        user.profilePicture = null;
+        await user.save();
+
+        res.json({ message: 'Profile picture removed successfully' });
+    } catch (error) {
+        console.error('Error removing profile picture:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

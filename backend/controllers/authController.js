@@ -26,7 +26,8 @@ export const registerUser = async (req, res) => {
             message: 'User registered successfully!',
             token, // Send the token
             auraPoints: newUser.auraPoints, // Send auraPoints if needed
-            userId: newUser._id // Send userId if needed
+            userId: newUser._id, // Send userId if needed
+            profilePicture:newUser.profilePicture || null,
         });
     } catch (error) {
         res.status(500).json({ message: 'Error registering user', error });
@@ -43,7 +44,11 @@ export const loginUser = async (req, res) => {
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).json({ token,auraPoints: user.auraPoints,userId: user._id });
+        res.status(200).json({ 
+            token,
+            auraPoints: user.auraPoints,
+            userId: user._id ,
+            profilePicture: user.profilePicture || null, });
     } catch (error) {
         res.status(500).json({ message: 'Error logging in', error });
     }

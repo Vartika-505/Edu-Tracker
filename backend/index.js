@@ -24,7 +24,6 @@ connectDB().then(() => {
         console.log(`Server running on port ${PORT}`);
     });
 });
-app.use('/api/leaderboard', leaderboardRoutes);
 // Routes
 
 app.use(session({
