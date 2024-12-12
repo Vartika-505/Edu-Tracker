@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext'; // Import AuthContext to a
 import logo from '../images/logo.png';
 
 const Navbar = () => {
-    const { token, handleLogout } = useContext(AuthContext); // Access token and handleLogout from AuthContext
+    const { token, username, handleLogout, profilePic } = useContext(AuthContext);
     const currentPath = useLocation().pathname; // Get current path
     const navigate = useNavigate(); // Use navigate hook for redirects
 
@@ -79,14 +79,7 @@ const Navbar = () => {
                                     Tasks
                                 </Link>
                             </li>
-                            <li className="h-full">
-                                <Link
-                                    to="/profile"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    Profile
-                                </Link>
-                            </li>
+                            
                             {/* Add Notes Link */}
                             <li className="h-full">
                                 <Link
@@ -105,6 +98,34 @@ const Navbar = () => {
                                     Leaderboard
                                 </Link>
                             </li>
+                            <li className="h-full">
+                                <Link
+                                    to="/profile"
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
+                                >
+                                     <div className="flex items-center mr-4">
+                            <img
+                                src={profilePic || 'https://via.placeholder.com/40'}
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full"
+                            />
+                            <span className={`ml-2 font-semibold ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'} `}>{username}</span>
+                        </div>
+                                </Link>
+                            </li>
+                            {/* <div className="flex items-center h-full mr-4 px-4 py-2 ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'">
+                            <img
+                                src={profilePic || 'https://via.placeholder.com/40'}
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full"
+                            />
+                            <span className="ml-2 text-purple-800 font-semibold"><Link
+                                    to="/profile"
+                                >
+                                    {username}
+                                </Link>
+                            </span>
+                        </div> */}
                         </>
                     )}
                 </ul>

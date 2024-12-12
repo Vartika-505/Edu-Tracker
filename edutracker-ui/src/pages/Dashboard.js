@@ -78,10 +78,10 @@ const Dashboard = () => {
         token && (
             <div className="min-h-screen bg-white flex flex-col items-center p-6 relative overflow-hidden">
                 <Navbar handleLogout={handleLogout} />
-                <div className="absolute top-20 right-10 bg-[#5a189a] shadow-lg rounded-lg p-4 w-48 text-center">
+                <div className="fixed top-20 right-10 bg-[#5a189a] shadow-lg rounded-lg p-4 w-48 text-center">
                     <h2 className="text-xl font-semibold text-white">Aura Points</h2>
                     <p className="text-2xl text-white font-bold">{auraPoints}</p>
-                    <p className="text-lg text-white mt-2">Level: {level}</p>
+                    <p className="text-lg font-semibold text-white mt-2">Level: {level}</p>
                 </div>
                 <header className="flex items-center mb-10 mt-20 text-center">
                     <div className="text-left">
