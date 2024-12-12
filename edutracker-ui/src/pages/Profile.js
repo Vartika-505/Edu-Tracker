@@ -34,6 +34,8 @@ const Profile = () => {
             const data = await response.json();
             setTotalTasks(data.totalTasks);
             setCompletedTasks(data.completedTasks);
+            localStorage.setItem('totalTasks', totalTasks);
+            localStorage.setItem('completedTasks', completedTasks);
         } catch (error) {
             console.error('Error fetching task summary:', error);
         }
@@ -113,8 +115,11 @@ const Profile = () => {
                 <div className="flex flex-col items-center mb-6">
                     {profilePic ? (
                         <div>
+                            <div className="flex items-center justify-center">
                             <img src={profilePic} alt="Profile" className="w-32 h-32 rounded-full mb-4" />
-                            <div className="flex space-x-4">
+                             </div>
+                            
+                        <div className="flex space-x-4">
                         
                         <label className="bg-purple-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-purple-700 transition">
                             Change Profile

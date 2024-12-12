@@ -15,7 +15,7 @@ export const registerUser = async (req, res) => {
 
         // Hash the password and create a new user
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword, auraPoints: 0 });
+        const newUser = new User({ username, email, password: hashedPassword, auraPoints: 0,totalTasks,completedTasks });
         await newUser.save();
 
         // Generate a token for the newly registered user
@@ -27,7 +27,10 @@ export const registerUser = async (req, res) => {
             token, // Send the token
             auraPoints: newUser.auraPoints, // Send auraPoints if needed
             userId: newUser._id, // Send userId if needed
+            email:newUser.email,
             profilePicture:newUser.profilePicture || null,
+            totalTasks:newUser.totalTasks,
+            completedTasks:newUser.completedTasks,
         });
     } catch (error) {
         res.status(500).json({ message: 'Error registering user', error });
@@ -48,6 +51,9 @@ export const loginUser = async (req, res) => {
             token,
             auraPoints: user.auraPoints,
             userId: user._id ,
+            email:user.email,
+            totalTasks:user.totalTasks,
+            completedTasks:user.completedTasks,
             profilePicture: user.profilePicture || null, });
     } catch (error) {
         res.status(500).json({ message: 'Error logging in', error });

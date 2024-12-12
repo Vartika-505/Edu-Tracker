@@ -7,14 +7,14 @@ import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
     const [usernameInput, setUsernameInput] = useState('');
-    const [email, setEmail] = useState('');
+    // const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
 
     // Retrieve context functions and variables
-    const { token, setToken, setUsername, setUserId, setAuraPoints, handleLogout,setProfilePic } = useContext(AuthContext);
+    const { token, setToken,email,setEmail, setUsername, setUserId, setAuraPoints, handleLogout,setProfilePic } = useContext(AuthContext);
     
     useEffect(() => {
         const checkTokenValidity = async () => {
@@ -32,8 +32,10 @@ const Login = () => {
                     setIsLoggedIn(true);
                     setUsername(localUsername);
                     setAuraPoints(Number(storedAuraPoints));
+                    setEmail(email);
                     setUserId(storedUserId);  // Set userId from localStorage to context
                     setProfilePic(localStorage.getItem('profilePicture'));
+
                 } catch (error) {
                     console.log("Token validation failed, logging out.");
                     handleLogout(); // Call handleLogout from context to clear session
@@ -52,12 +54,15 @@ const Login = () => {
                 password,
             });
     
-            const { token, auraPoints, userId, profilePicture } = response.data;
+            const { token, auraPoints, userId, email: userEmail, profilePicture, totalTasks, completedTasks } = response.data;
     
             // Store details in local storage
             localStorage.setItem('token', token);
             localStorage.setItem('auraPoints', auraPoints);
             localStorage.setItem('userId', userId);
+            localStorage.setItem('email', userEmail); // Update local storage for email
+            localStorage.setItem('totalTasks', totalTasks || 0);
+            localStorage.setItem('completedTasks', completedTasks || 0);
     
             if (profilePicture) {
                 localStorage.setItem('profilePicture', profilePicture);
@@ -72,7 +77,7 @@ const Login = () => {
             setUsername(usernameInput);
             setUserId(userId);
             setAuraPoints(auraPoints);
-    
+            setEmail(userEmail); // Update context for email
             setMessage('Login successful!');
             setUsernameInput('');
             setPassword('');
