@@ -36,12 +36,16 @@ const RoomPage = () => {
             setMembers(memberList);
         });
 
-        axios.get(`${API_URL}/rooms/details/${roomId}`)
+        axios.get(`${API_URL}/rooms/room/${roomId}`)
             .then(res => {
                 setRoomCode(res.data.code);
-                setMembers(res.data.members);
+                setMembers(res.data.members || []); 
             })
-            .catch(err => console.error("Error fetching room details:", err));
+            .catch(err => {
+                console.error("Error fetching room details:", err);
+                setMembers([]); // ✅ Fallback to empty array
+            });
+
 
         return () => {
             socket.emit('leaveRoom', { roomId, userId });
