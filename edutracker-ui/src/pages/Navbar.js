@@ -100,6 +100,14 @@ const Navbar = () => {
                             </li>
                             <li className="h-full">
                                 <Link
+                                    to="/rooms"
+                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/rooms' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
+                                >
+                                    Rooms
+                                </Link>
+                            </li>
+                            <li className="h-full">
+                                <Link
                                     to="/profile"
                                     className={`flex items-center h-full px-4 py-2 ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
                                 >

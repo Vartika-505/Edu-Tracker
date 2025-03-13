@@ -15,6 +15,9 @@ import Timer from './pages/Timer';
 import Notes from './pages/Notes';  // Import Notes page
 import { NotesProvider } from './context/NotesContext';  // Import NotesProvider
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import RoomsPage from "./pages/RoomsPage";
+import RoomPage from "./pages/RoomPage";
+
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -116,8 +119,11 @@ export default function App() {
                     profilePic={profilePic}
                     handleLogout={handleLogout}
                   />
+                  
                 } 
               />
+              <Route path="/rooms" element={<RoomsPage />} />  {/* Main rooms page */}
+              <Route path="/room/:roomId" element={<RoomPage />} />  {/* Individual room page */}
             </Routes>
           </BrowserRouter>
         </AuthProvider>
