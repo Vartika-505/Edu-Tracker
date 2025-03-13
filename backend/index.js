@@ -24,8 +24,10 @@ app.use(express.json());
 const server = http.createServer(app);
 export const io = new Server(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: "http://localhost:3000", // Replace with your front-end URL
+        methods: ["GET", "POST"],
+        allowedHeaders: ["Content-Type"],
+        credentials: true
     }
 });
 
@@ -46,7 +48,7 @@ app.use(session({
 }));
 
 io.on('connection', (socket) => {
-    console.log('A user connected');
+    console.log(`User connected with ID: ${socket.id}`);
 
     socket.on('joinRoom', async ({ roomId, userId, username }) => {
         socket.join(roomId);
@@ -69,9 +71,27 @@ io.on('connection', (socket) => {
 
     socket.on('sendMessage', async ({ roomId, sender, text }) => {
         const message = { sender, text, timestamp: new Date() };
-        io.to(roomId).emit('messageReceived', message);
+    
+        // Save the message to the database
+        const room = await Room.findById(roomId);
+        if (room) {
+            // Add the message to the room's messages array
+            room.messages.push(message); 
+    
+            // Log the room before saving to verify the messages array
+            console.log("Room before saving:", room);
+    
+            // Save the room with the new message
+            await room.save(); 
+            
+            // Emit the message to everyone in the room
+            io.to(roomId).emit('messageReceived', message);
+        } else {
+            console.log(`Room with ID ${roomId} not found.`);
+        }
     });
-
+    
+    
     socket.on('leaveRoom', async ({ roomId, userId }) => {
         socket.leave(roomId);
 
@@ -85,7 +105,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log('User disconnected');
+        console.log(`User disconnected: ${socket.id}`);
     });
 });
 

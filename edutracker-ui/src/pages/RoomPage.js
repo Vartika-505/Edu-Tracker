@@ -6,7 +6,11 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-const socket = io(API_URL);
+const socket = io(API_URL, {
+    reconnection: true,  // Try to reconnect automatically if the connection is lost
+    reconnectionAttempts: 5, // Maximum attempts before giving up
+    reconnectionDelay: 1000, // Delay between reconnection attempts
+});
 
 const RoomPage = () => {
     const { roomId } = useParams();
@@ -17,6 +21,7 @@ const RoomPage = () => {
     const [message, setMessage] = useState('');
     const [members, setMembers] = useState([]);
     const [roomCode, setRoomCode] = useState('');
+    const [isSocketConnected, setIsSocketConnected] = useState(false);
 
     useEffect(() => {
         if (!userId || !username) {
@@ -24,32 +29,56 @@ const RoomPage = () => {
             return;
         }
 
-        // Join room and fetch room details
+        // Listen for socket connection
+        socket.on('connect', () => {
+            console.log('Connected to the server with socket ID:', socket.id);
+            setIsSocketConnected(true);
+        });
+
+        // Handle connection error
+        socket.on('connect_error', (err) => {
+            console.error('Socket connection error:', err);
+            setIsSocketConnected(false);
+        });
+
+        // Handle connection timeout
+        socket.on('connect_timeout', () => {
+            console.error('Socket connection timed out');
+            setIsSocketConnected(false);
+        });
+
+        // Join the room after connection is established
         socket.emit('joinRoom', { roomId, userId, username });
 
-        socket.on('messageReceived', (msg) => {
-            setMessages(prev => [...prev, msg]);
-        });
-
-        socket.on('updateMembers', (memberList) => {
-            console.log("Updated members:", memberList);  // Debugging
-            setMembers(memberList);
-        });
-
+        // Fetch room details and messages
         axios.get(`${API_URL}/rooms/room/${roomId}`)
             .then(res => {
+                console.log("Room data:", res.data);
                 setRoomCode(res.data.code);
-                setMembers(res.data.members || []); 
+                setMessages(res.data.messages || []);
+                setMembers(res.data.members || []);
             })
             .catch(err => {
                 console.error("Error fetching room details:", err);
-                setMembers([]); // ✅ Fallback to empty array
+                setMessages([]); // Fallback to empty array in case of error
             });
 
+        // Listen for new messages
+        socket.on('messageReceived', (msg) => {
+            console.log("Received message:", msg);
+            setMessages(prev => [...prev, msg]);
+        });
 
+        // Listen for updated member list
+        socket.on('updateMembers', (memberList) => {
+            console.log("Updated members:", memberList);
+            setMembers(memberList);
+        });
+
+        // Cleanup function - remove all socket listeners when component unmounts
         return () => {
             socket.emit('leaveRoom', { roomId, userId });
-            socket.disconnect();
+            socket.removeAllListeners();
         };
     }, [roomId, userId, username, navigate]);
 
@@ -58,8 +87,8 @@ const RoomPage = () => {
             const msgData = { roomId, sender: username, text: message };
 
             socket.emit('sendMessage', msgData);
-            setMessages(prev => [...prev, msgData]);
-            setMessage('');
+            setMessages(prev => [...prev, msgData]); // Update message UI immediately
+            setMessage(''); // Clear message input
         }
     };
 
@@ -112,6 +141,11 @@ const RoomPage = () => {
                     style={{ flex: 1, padding: '5px' }}
                 />
                 <button onClick={sendMessage} style={{ marginLeft: '5px', padding: '5px 10px' }}>Send</button>
+            </div>
+
+            {/* Connection Status */}
+            <div style={{ padding: '10px', backgroundColor: isSocketConnected ? 'green' : 'red', color: 'white' }}>
+                {isSocketConnected ? 'Connected to server' : 'Disconnected from server'}
             </div>
         </div>
     );
