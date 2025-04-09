@@ -15,9 +15,9 @@ export const registerUser = async (req, res) => {
 
         // Hash the password and create a new user
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword, auraPoints: 0,totalTasks,completedTasks });
+        const newUser = new User({ username, email, password: hashedPassword, auraPoints: 0,totalTasks:0,completedTasks:0 });
         await newUser.save();
-
+        console.log(newUser);
         // Generate a token for the newly registered user
         const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
@@ -33,6 +33,7 @@ export const registerUser = async (req, res) => {
             completedTasks:newUser.completedTasks,
         });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: 'Error registering user', error });
     }
 };
