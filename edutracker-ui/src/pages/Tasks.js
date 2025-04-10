@@ -1,12 +1,11 @@
-// src/components/Tasks.js
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import Navbar from './Navbar'; // Assuming Navbar is in the same folder
+import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
+import { AuthContext } from '../context/AuthContext';
 
 const Tasks = () => {
-    const { token, username, setAuraPoints, handleLogout } = useContext(AuthContext); // Access context values
+    const { token, username, setAuraPoints, handleLogout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [tasks, setTasks] = useState([]);
     const [name, setName] = useState('');
@@ -14,16 +13,15 @@ const Tasks = () => {
     const [deadline, setDeadline] = useState('');
     const [difficultyLevel, setDifficultyLevel] = useState(50);
 
-    // Fetch tasks when the component mounts
     useEffect(() => {
         if (!token) {
-            navigate('/login'); // Redirect to login if no token
+            navigate('/login');
         } else {
             const fetchTasks = async () => {
                 try {
                     const userId = localStorage.getItem('userId');
-                    if (!userId) navigate('/login'); // Redirect to login if no userId
-                    
+                    if (!userId) navigate('/login');
+
                     const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`);
                     setTasks(response.data);
                 } catch (error) {
@@ -36,10 +34,7 @@ const Tasks = () => {
 
     const addTask = async () => {
         const userId = localStorage.getItem('userId');
-        if (!userId) {
-            console.error("User ID not found");
-            return;
-        }
+        if (!userId) return console.error("User ID not found");
         const newTask = { userId, name, category, deadline, difficultyLevel };
         try {
             const response = await axios.post('http://localhost:5000/api/tasks', newTask);
@@ -58,7 +53,9 @@ const Tasks = () => {
         try {
             const currentDate = new Date();
             await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`, { completionDate: currentDate });
-            setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true, completionDate: currentDate } : task)));
+            setTasks(tasks.map(task => (
+                task._id === taskId ? { ...task, completed: true, completionDate: currentDate } : task
+            )));
             setAuraPoints(prev => prev + difficulty);
         } catch (error) {
             console.error("Error completing task", error);
@@ -68,22 +65,19 @@ const Tasks = () => {
     const formatDeadline = (date) => {
         const d = new Date(date);
         if (isNaN(d.getTime())) return '';
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        return `${day}/${month}/${year}`;
+        return `${d.getDate().toString().padStart(2, '0')}/${
+            (d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-r from-purple-400 via-purple-300 to-purple-200 p-6 pt-20">
-            {/* Navbar */}
+        <div className="min-h-screen bg-gradient-to-r from-purple-400 via-purple-300 to-purple-200 p-4 mt-16 sm:p-6 pt-20">
             <Navbar token={token} handleLogout={handleLogout} />
-            
-            <div className="mt-8 flex justify-around">
+
+            <div className="mt-8 flex flex-col lg:flex-row lg:justify-between gap-6">
                 {/* Add Task Form */}
-                <div>
-                    <h2 className="text-4xl font-bold text-white mb-6 text-center">Add Task</h2>
-                    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-4 mb-8">
+                <div className="flex-1">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 text-center lg:text-left">Add Task</h2>
+                    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md mx-auto lg:mx-0 space-y-4 mb-6">
                         <input
                             type="text"
                             placeholder="Task Name"
@@ -123,12 +117,16 @@ const Tasks = () => {
                         </button>
                     </div>
                 </div>
+
                 {/* Task List */}
-                <div className="w-1/2">
-                    <h3 className="text-4xl font-semibold text-white mb-4 text-center">Your Tasks:</h3>
-                    <ul className="space-y-4 max-h-[62vh] overflow-y-auto">
+                <div className="flex-1">
+                    <h3 className="text-3xl sm:text-4xl font-semibold text-white mb-6 text-center lg:text-left">Your Tasks</h3>
+                    <ul className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
                         {tasks.map(task => (
-                            <li key={task._id} className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                            <li
+                                key={task._id}
+                                className="bg-white p-4 rounded-lg shadow-md flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3"
+                            >
                                 <div>
                                     <h4 className="text-lg font-semibold text-purple-800">{task.name}</h4>
                                     <p className="text-sm text-gray-500">Due: {formatDeadline(task.deadline)}</p>
@@ -136,7 +134,11 @@ const Tasks = () => {
                                 <button
                                     onClick={() => completeTask(task._id, task.difficultyLevel)}
                                     disabled={task.completed}
-                                    className={`py-1 px-3 rounded-md text-white ${task.completed ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-800'}`}
+                                    className={`py-2 px-4 rounded-md text-white text-sm ${
+                                        task.completed
+                                            ? 'bg-gray-400 cursor-not-allowed'
+                                            : 'bg-purple-600 hover:bg-purple-800'
+                                    }`}
                                 >
                                     {task.completed ? 'Completed' : 'Complete'}
                                 </button>

@@ -1,149 +1,125 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext'; // Import AuthContext to access token and handleLogout
+import { AuthContext } from '../context/AuthContext';
 import logo from '../images/logo.png';
+import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
     const { token, username, handleLogout, profilePic } = useContext(AuthContext);
-    const currentPath = useLocation().pathname; // Get current path
-    const navigate = useNavigate(); // Use navigate hook for redirects
+    const currentPath = useLocation().pathname;
+    const navigate = useNavigate();
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleLogoutAndRedirect = () => {
-        handleLogout(); // Call the context's logout function
-        navigate('/home'); // Redirect to home page after logout
+        handleLogout();
+        navigate('/home');
+        setIsOpen(false);
     };
 
+    const navLinkClass = (path, isMobile = false) => {
+        const isActive = currentPath === path;
+        const baseStyle = 'flex items-center px-4 py-2 transition-all duration-300';
+    
+        if (isMobile) {
+            return `${baseStyle} rounded-md ${isActive ? 'bg-[#9d4edd] text-white' : 'text-[#7636aa]'}`;
+        } else {
+            return `${baseStyle} h-full ${isActive ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`;
+        }
+    };
+    
     return (
-        <nav className="flex items-center px-6 py-4 fixed top-0 left-0 right-0 justify-between w-full z-10 bg-white">
-            <img src={logo} alt="EduTracker Logo" width="100px" />
-            <div className="flex justify-center items-center h-full absolute right-0 m-[1vw]">
-                <ul className="flex gap-5 mr-10 h-full">
+<nav className="bg-white fixed top-0 left-0 right-0 z-10 w-full px-6 py-4 shadow-md">
+<div className="flex justify-between items-center">
+                <img src={logo} alt="EduTracker Logo" width="100px" />
+
+                {/* Mobile Menu Button */}
+                <button className="md:hidden text-[#7636aa]" onClick={() => setIsOpen(!isOpen)}>
+                    {isOpen ? <X size={28} /> : <Menu size={28} />}
+                </button>
+
+                {/* Desktop Menu */}
+                <div className="hidden md:flex justify-center items-center h-full absolute right-0 m-[1vw]">
+                    <ul className="flex gap-5 mr-10 h-full items-stretch">
+                        {!token ? (
+                            <>
+                                <li className="h-full"><Link to="/home" className={navLinkClass('/home')}>Home</Link></li>
+                                <li className="h-full"><Link to="/about" className={navLinkClass('/about')}>About</Link></li>
+                                <li className="h-full"><Link to="/services" className={navLinkClass('/services')}>Services</Link></li>
+                                <li className="h-full"><Link to="/contact" className={navLinkClass('/contact')}>Contact</Link></li>
+                            </>
+                        ) : (
+                            <>
+                                <li className="h-full"><Link to="/dashboard" className={navLinkClass('/dashboard')}>Dashboard</Link></li>
+                                <li className="h-full"><Link to="/timetable" className={navLinkClass('/timetable')}>Timetable</Link></li>
+                                <li className="h-full"><Link to="/tasks" className={navLinkClass('/tasks')}>Tasks</Link></li>
+                                <li className="h-full"><Link to="/notes" className={navLinkClass('/notes')}>Notes</Link></li>
+                                <li className="h-full"><Link to="/leaderboard" className={navLinkClass('/leaderboard')}>Leaderboard</Link></li>
+                                <li className="h-full">
+                                    <Link to="/profile" className={navLinkClass('/profile')}>
+                                        <div className="flex items-center mr-4">
+                                            <img
+                                                src={profilePic || 'https://via.placeholder.com/40'}
+                                                alt="Profile"
+                                                className="w-10 h-10 rounded-full"
+                                            />
+                                            <span className="ml-2 font-semibold">{username}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            </>
+                        )}
+                    </ul>
                     {!token ? (
                         <>
-                            <li className="h-full">
-                                <Link
-                                    to="/home"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/home' || currentPath === '/' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    Home
-                                </Link>
-                            </li>
-                            <li className="h-full">
-                                <Link
-                                    to="/about"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/about' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    About
-                                </Link>
-                            </li>
-                            <li className="h-full">
-                                <Link
-                                    to="/services"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/services' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    Services
-                                </Link>
-                            </li>
-                            <li className="h-full">
-                                <Link
-                                    to="/contact"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/contact' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    Contact
-                                </Link>
-                            </li>
+                            <Link to="/signup">
+                                <button className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100 mr-2">Sign Up</button>
+                            </Link>
+                            <Link to="/login">
+                                <button className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100">Login</button>
+                            </Link>
                         </>
                     ) : (
-                        <>
-                            <li className="h-full">
-                                <Link
-                                    to="/dashboard"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/dashboard' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    Dashboard
-                                </Link>
-                            </li>
-                            <li className="h-full">
-                                <Link
-                                    to="/timetable"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/timetable' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    Timetable
-                                </Link>
-                            </li>
-                            <li className="h-full">
-                                <Link
-                                    to="/tasks"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/tasks' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    Tasks
-                                </Link>
-                            </li>
-                            
-                            {/* Add Notes Link */}
-                            <li className="h-full">
-                                <Link
-                                    to="/notes"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/notes' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    Notes
-                                </Link>
-                            </li>
-                            {/* Leaderboard Link */}
-                            <li className="h-full">
-                                <Link
-                                    to="/leaderboard"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/leaderboard' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                    Leaderboard
-                                </Link>
-                            </li>
-                            <li className="h-full">
-                                <Link
-                                    to="/profile"
-                                    className={`flex items-center h-full px-4 py-2 ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'}`}
-                                >
-                                     <div className="flex items-center mr-4">
-                            <img
-                                src={profilePic || 'https://via.placeholder.com/40'}
-                                alt="Profile"
-                                className="w-10 h-10 rounded-full"
-                            />
-                            <span className={`ml-2 font-semibold ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'} `}>{username}</span>
-                        </div>
-                                </Link>
-                            </li>
-                            {/* <div className="flex items-center h-full mr-4 px-4 py-2 ${currentPath === '/profile' ? 'bg-[#9d4edd] text-white rounded-b-3xl' : 'text-[#7636aa]'">
-                            <img
-                                src={profilePic || 'https://via.placeholder.com/40'}
-                                alt="Profile"
-                                className="w-10 h-10 rounded-full"
-                            />
-                            <span className="ml-2 text-purple-800 font-semibold"><Link
-                                    to="/profile"
-                                >
-                                    {username}
-                                </Link>
-                            </span>
-                        </div> */}
-                        </>
+                        <button onClick={handleLogoutAndRedirect} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                            Logout
+                        </button>
                     )}
-                </ul>
-                {!token ? (
-                    <>
-                        <Link to="/signup">
-                            <button className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100 mr-2">Sign Up</button>
-                        </Link>
-                        <Link to="/login">
-                            <button className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100">Login</button>
-                        </Link>
-                    </>
-                ) : (
-                    <button onClick={handleLogoutAndRedirect} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                        Logout
-                    </button>
-                )}
+                </div>
             </div>
+
+            {/* Mobile Dropdown */}
+            {isOpen && (
+                <div className="md:hidden flex justify-center mt-4">
+                    <div className="bg-white rounded-xl shadow-lg w-11/12 p-4">
+                    <ul className="flex flex-col gap-2">
+                        {!token ? (
+                            <>
+                                <li><Link to="/home" className={navLinkClass('/home',true)} onClick={() => setIsOpen(false)}>Home</Link></li>
+                                <li><Link to="/about" className={navLinkClass('/about',true)} onClick={() => setIsOpen(false)}>About</Link></li>
+                                <li><Link to="/services" className={navLinkClass('/services',true)} onClick={() => setIsOpen(false)}>Services</Link></li>
+                                <li><Link to="/contact" className={navLinkClass('/contact',true)} onClick={() => setIsOpen(false)}>Contact</Link></li>
+                                <li><Link to="/signup"><button className="w-full text-blue-600 py-2 rounded hover:bg-gray-100">Sign Up</button></Link></li>
+                                <li><Link to="/login"><button className="w-full text-blue-600 py-2 rounded hover:bg-gray-100">Login</button></Link></li>
+                            </>
+                        ) : (
+                            <>
+                                <li><Link to="/dashboard" className={navLinkClass('/dashboard',true)} onClick={() => setIsOpen(false)}>Dashboard</Link></li>
+                                <li><Link to="/timetable" className={navLinkClass('/timetable',true)} onClick={() => setIsOpen(false)}>Timetable</Link></li>
+                                <li><Link to="/tasks" className={navLinkClass('/tasks',true)} onClick={() => setIsOpen(false)}>Tasks</Link></li>
+                                <li><Link to="/notes" className={navLinkClass('/notes',true)} onClick={() => setIsOpen(false)}>Notes</Link></li>
+                                <li><Link to="/leaderboard" className={navLinkClass('/leaderboard',true)} onClick={() => setIsOpen(false)}>Leaderboard</Link></li>
+                                <li><Link to="/profile" className={navLinkClass('/profile',true)} onClick={() => setIsOpen(false)}>
+                                    <div className="flex items-center">
+                                        <img src={profilePic || 'https://via.placeholder.com/40'} className="w-8 h-8 rounded-full" alt="Profile" />
+                                        <span className="ml-2 font-semibold">{username}</span>
+                                    </div>
+                                </Link></li>
+                                <li><button onClick={handleLogoutAndRedirect} className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">Logout</button></li>
+                            </>
+                        )}
+                    </ul>
+                    </div>
+                </div>
+            )}
         </nav>
     );
 };
