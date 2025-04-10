@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import logo from '../images/logo.png';
+import Chat from "./Chat";
 import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
@@ -54,6 +55,7 @@ const Navbar = () => {
                                 <li className="h-full"><Link to="/tasks" className={navLinkClass('/tasks')}>Tasks</Link></li>
                                 <li className="h-full"><Link to="/notes" className={navLinkClass('/notes')}>Notes</Link></li>
                                 <li className="h-full"><Link to="/leaderboard" className={navLinkClass('/leaderboard')}>Leaderboard</Link></li>
+                                <li className="h-full"><Link to="/chat" className={navLinkClass('/chat')}>Chat</Link></li>
                                 <li className="h-full">
                                     <Link to="/profile" className={navLinkClass('/profile')}>
                                         <div className="flex items-center mr-4">
@@ -107,6 +109,7 @@ const Navbar = () => {
                                 <li><Link to="/tasks" className={navLinkClass('/tasks',true)} onClick={() => setIsOpen(false)}>Tasks</Link></li>
                                 <li><Link to="/notes" className={navLinkClass('/notes',true)} onClick={() => setIsOpen(false)}>Notes</Link></li>
                                 <li><Link to="/leaderboard" className={navLinkClass('/leaderboard',true)} onClick={() => setIsOpen(false)}>Leaderboard</Link></li>
+                                <li><Link to="/chat" className={navLinkClass('/chat',true)} onClick={() => setIsOpen(false)}>Chat</Link></li>
                                 <li><Link to="/profile" className={navLinkClass('/profile',true)} onClick={() => setIsOpen(false)}>
                                     <div className="flex items-center">
                                         <img src={profilePic || 'https://via.placeholder.com/40'} className="w-8 h-8 rounded-full" alt="Profile" />

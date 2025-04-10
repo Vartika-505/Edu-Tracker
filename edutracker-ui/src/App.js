@@ -15,6 +15,7 @@ import Timer from './pages/Timer';
 import Notes from './pages/Notes';  // Import Notes page
 import { NotesProvider } from './context/NotesContext';  // Import NotesProvider
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import Chat from './pages/Chat';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -118,6 +119,7 @@ export default function App() {
                   />
                 } 
               />
+              <Route path="/chat" element={<Chat username={username} />} />
             </Routes>
           </BrowserRouter>
         </AuthProvider>

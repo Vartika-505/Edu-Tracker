@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import Navbar from "./Navbar";
 import MotivationQuote from "./MotivationQuote";
 
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const {
@@ -144,6 +145,9 @@ const Dashboard = () => {
         <div className="mt-10 w-full">
           <MotivationQuote />
         </div>
+        {/* <div className="mt-10 w-full">
+          <Chat username={username} />
+        </div> */}
       </div>
     )
   );
