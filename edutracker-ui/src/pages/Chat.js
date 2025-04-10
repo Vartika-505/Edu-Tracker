@@ -47,7 +47,7 @@ const Chat = ({ username }) => {
 
     const msgData = {
       room,
-      username,
+      username: username || "Anonymous", // Ensure username is never empty
       text: message,
       timestamp: new Date(),
     };
@@ -70,6 +70,7 @@ const Chat = ({ username }) => {
     setMessage("");
     setFile(null);
   };
+  
   const handleDelete = async (msgId) => {
     try {
       await fetch(`http://localhost:5000/api/messages/${msgId}`, {
@@ -78,6 +79,12 @@ const Chat = ({ username }) => {
     } catch (err) {
       console.error("Delete failed", err);
     }
+  };
+
+  // Helper function to get a safe display name for avatars
+  const getDisplayInitial = (name) => {
+    if (!name || name.length === 0) return "?";
+    return name[0].toUpperCase();
   };
 
   return (
@@ -118,7 +125,7 @@ const Chat = ({ username }) => {
                 >
                   {!isMe && (
                     <div className="w-8 h-8 rounded-full bg-purple-400 text-white flex items-center justify-center mr-2 text-sm">
-                      {msg.username[0].toUpperCase()}
+                      {getDisplayInitial(msg.username)}
                     </div>
                   )}
                   <div
@@ -129,7 +136,7 @@ const Chat = ({ username }) => {
                     }`}
                   >
                     <div className="font-bold mb-1">
-                      {msg.username}{" "}
+                      {msg.username || "Anonymous"}{" "}
                       <span className="text-[10px] ml-1 text-gray-400">
                         {dayjs(msg.timestamp).format("HH:mm:ss")}
                       </span>
@@ -166,7 +173,7 @@ const Chat = ({ username }) => {
                   </div>
                   {isMe && (
                     <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center ml-2 text-sm">
-                      {username[0].toUpperCase()}
+                      {getDisplayInitial(username)}
                     </div>
                   )}
                 </div>

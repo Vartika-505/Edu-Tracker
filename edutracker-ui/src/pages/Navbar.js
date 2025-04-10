@@ -10,7 +10,7 @@ const Navbar = () => {
     const currentPath = useLocation().pathname;
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
-
+    console.log("profileL:"+profilePic);
     const handleLogoutAndRedirect = () => {
         handleLogout();
         navigate('/home');
@@ -112,6 +112,7 @@ const Navbar = () => {
                                 <li><Link to="/chat" className={navLinkClass('/chat',true)} onClick={() => setIsOpen(false)}>Chat</Link></li>
                                 <li><Link to="/profile" className={navLinkClass('/profile',true)} onClick={() => setIsOpen(false)}>
                                     <div className="flex items-center">
+    
                                         <img src={profilePic || 'https://via.placeholder.com/40'} className="w-8 h-8 rounded-full" alt="Profile" />
                                         <span className="ml-2 font-semibold">{username}</span>
                                     </div>

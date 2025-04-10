@@ -92,11 +92,7 @@ io.on("connection", (socket) => {
       }
     });
 
-    io.to(room).emit("receive_message", {
-      username,
-      text,
-      timestamp: message.timestamp,
-    });
+    io.to(room).emit("receive_message", message);
   });
 
   socket.on("disconnect", () => {
@@ -107,7 +103,7 @@ app.delete("/api/messages/:id", async (req, res) => {
   try {
     const deleted = await Message.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: "Message not found" });
-    io.to(deleted.room).emit("delete_message", deleted._id); // broadcast deletion
+    io.to(deleted.room).emit("delete_message", deleted._id);
     res.status(200).json({ success: true });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete message" });
