@@ -110,74 +110,73 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSignIn = async (response) => {
-    const { credential } = response;
-    if (!credential) {
-      console.error("Token ID or Profile object is missing.");
-      return;
-    }
+const handleGoogleSignIn = async (response) => {
+  const { credential } = response;
+  if (!credential) {
+    console.error("Token ID or Profile object is missing.");
+    return;
+  }
 
-    const decoded = JSON.parse(atob(credential.split(".")[1])); 
-    const emailPrefix = decoded.email.split("@")[0];
-    const googleId = decoded.sub;
-    
-    try {
-      const googleSignInResponse = await axios.post(
-        "http://localhost:5000/api/auth/googleSign",
+  const decoded = JSON.parse(atob(credential.split(".")[1])); 
+  const googleDisplayName = decoded.name || decoded.given_name || decoded.email.split("@")[0];
+  const googleId = decoded.sub;
+  
+  try {
+    const googleSignInResponse = await axios.post(
+      "http://localhost:5000/api/auth/googleSign",
+      {
+        googleId,
+        username: googleDisplayName, 
+        email: decoded.email,
+      }
+    );
+
+    const existingUser = googleSignInResponse.data;
+    if (existingUser) {
+      console.log("User exists:", existingUser); 
+      
+      setToken(existingUser.token);
+      setUsername(googleDisplayName); 
+      setUserId(existingUser.userId);
+      setAuraPoints(existingUser.auraPoints);
+      setEmail(existingUser.email);
+
+      if (existingUser.profilePicture) {
+        setProfilePic(existingUser.profilePicture);
+      } else {
+        setProfilePic('');
+      }
+
+      navigate("/dashboard");
+    } else {
+      console.log("User does not exist, creating new user.");
+      const newUserResponse = await axios.post(
+        "http://localhost:5000/api/auth/signup",
         {
-          googleId,
-          username: emailPrefix, 
           email: decoded.email,
+          username: googleDisplayName, 
+          password: "google-auth", 
         }
       );
 
-      const existingUser = googleSignInResponse.data;
-      if (existingUser) {
-        console.log("User exists:", existingUser); 
-        
-        setToken(existingUser.token);
-        setUsername(emailPrefix);
-        setUserId(existingUser.userId);
-        setAuraPoints(existingUser.auraPoints);
-        setEmail(existingUser.email);
-
-        if (existingUser.profilePicture) {
-          setProfilePic(existingUser.profilePicture);
-        } else {
-          setProfilePic('');
-        }
-
-        navigate("/dashboard");
+      const newUser = newUserResponse.data;
+      setToken(newUser.token);
+      setUsername(googleDisplayName);
+      setUserId(newUser.userId);
+      setEmail(newUser.email);
+      setAuraPoints(0);
+      if (newUser.profilePicture) {
+        setProfilePic(newUser.profilePicture);
       } else {
-        console.log("User does not exist, creating new user.");
-        const newUserResponse = await axios.post(
-          "http://localhost:5000/api/auth/signup",
-          {
-            email: decoded.email,
-            username: emailPrefix,
-            password: "google-auth", 
-          }
-        );
-
-        const newUser = newUserResponse.data;
-        setToken(newUser.token);
-        setUsername(emailPrefix);
-        setUserId(newUser.userId);
-        setEmail(newUser.email);
-        setAuraPoints(0);
-        if (newUser.profilePicture) {
-          setProfilePic(newUser.profilePicture);
-        } else {
-          setProfilePic('');
-        }
-
-        navigate("/dashboard");
+        setProfilePic('');
       }
-    } catch (error) {
-      console.error("Error during Google sign-in:", error);
-    }
-  };
 
+      navigate("/dashboard");
+    }
+  } catch (error) {
+    console.error("Error during Google sign-in:", error);
+  }
+};
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar token={token} handleLogout={handleLogout} />

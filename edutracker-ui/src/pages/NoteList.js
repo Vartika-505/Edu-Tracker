@@ -1,4 +1,3 @@
-// components/NoteList.js
 import React from 'react';
 import { useNotes } from '../context/NotesContext'
 import NoteItem from './NoteItem';
