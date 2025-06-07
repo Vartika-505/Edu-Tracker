@@ -119,7 +119,7 @@ export default function App() {
                   />
                 } 
               />
-              <Route path="/chat" element={<Chat username={username} />} />
+              <Route path="/chat" element={<Chat />} />
             </Routes>
           </BrowserRouter>
         </AuthProvider>

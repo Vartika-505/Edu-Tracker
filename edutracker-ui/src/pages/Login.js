@@ -2,18 +2,15 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
-import { AuthContext } from "../context/AuthContext"; // Import AuthContext
+import { AuthContext } from "../context/AuthContext"; 
 import { GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const [usernameInput, setUsernameInput] = useState("");
-  // const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
-
-  // Retrieve context functions and variables
   const {
     token,
     setToken,
@@ -28,32 +25,37 @@ const Login = () => {
 
   useEffect(() => {
     const checkTokenValidity = async () => {
-      const token = localStorage.getItem("token");
+      const storedToken = localStorage.getItem("token");
       const localUsername = localStorage.getItem("username");
       const storedAuraPoints = localStorage.getItem("auraPoints");
       const storedUserId = localStorage.getItem("userId");
+      const storedEmail = localStorage.getItem("email"); 
+      const storedProfilePic = localStorage.getItem("profilePicture");
 
-      if (token) {
+      if (storedToken) {
         try {
-          // Validate token
           await axios.get("http://localhost:5000/api/auth/validate-token", {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${storedToken}` },
           });
+          
           setIsLoggedIn(true);
-          setUsername(localUsername);
-          setAuraPoints(Number(storedAuraPoints));
-          setEmail(email);
-          setUserId(storedUserId); // Set userId from localStorage to context
-          setProfilePic(localStorage.getItem("profilePicture"));
+          
+          setToken(storedToken);
+          setUsername(localUsername || '');
+          setAuraPoints(Number(storedAuraPoints) || 0);
+          setEmail(storedEmail || '');
+          setUserId(storedUserId || '');
+          setProfilePic(storedProfilePic || '');
+          
         } catch (error) {
           console.log("Token validation failed, logging out.");
-          handleLogout(); // Call handleLogout from context to clear session
+          handleLogout(); 
           setIsLoggedIn(false);
         }
       }
     };
     checkTokenValidity();
-  }, [setUsername, setAuraPoints, setUserId, handleLogout, setProfilePic]);
+  }, []); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,28 +78,21 @@ const Login = () => {
         completedTasks,
       } = response.data;
 
-      // Store details in local storage
-      localStorage.setItem("token", token);
-      localStorage.setItem("auraPoints", auraPoints);
-      localStorage.setItem("userId", userId);
-      localStorage.setItem("email", userEmail); // Update local storage for email
-      localStorage.setItem("totalTasks", totalTasks || 0);
-      localStorage.setItem("completedTasks", completedTasks || 0);
-
-      if (profilePicture) {
-        localStorage.setItem("profilePicture", profilePicture);
-        setProfilePic(profilePicture); // Update context
-      } else {
-        localStorage.removeItem("profilePicture");
-        setProfilePic(null); // Clear profile picture in context if not available
-      }
-
-      // Update context
       setToken(token);
       setUsername(usernameInput);
       setUserId(userId);
       setAuraPoints(auraPoints);
-      setEmail(userEmail); // Update context for email
+      setEmail(userEmail);
+      
+      if (profilePicture) {
+        setProfilePic(profilePicture);
+      } else {
+        setProfilePic(''); 
+      }
+
+      localStorage.setItem("totalTasks", totalTasks || 0);
+      localStorage.setItem("completedTasks", completedTasks || 0);
+
       setMessage("Login successful!");
       setUsernameInput("");
       setPassword("");
@@ -122,68 +117,59 @@ const Login = () => {
       return;
     }
 
-    const decoded = JSON.parse(atob(credential.split(".")[1])); // Decoding the token to extract user info
+    const decoded = JSON.parse(atob(credential.split(".")[1])); 
     const emailPrefix = decoded.email.split("@")[0];
     const googleId = decoded.sub;
+    
     try {
       const googleSignInResponse = await axios.post(
         "http://localhost:5000/api/auth/googleSign",
         {
-          googleId, // Sending Google ID to backend
-          username: emailPrefix, // Use email prefix as username
+          googleId,
+          username: emailPrefix, 
           email: decoded.email,
         }
       );
 
       const existingUser = googleSignInResponse.data;
       if (existingUser) {
-        console.log("User exists:", existingUser); // Log user data
-        localStorage.setItem("token", existingUser.token);
-        localStorage.setItem("username", emailPrefix);
-        localStorage.setItem("userId", existingUser.userId);
-        localStorage.setItem("email", existingUser.email);
-        localStorage.setItem("auraPoints", existingUser.auraPoints);
-
-        if (existingUser.profilePicture) {
-          localStorage.setItem("profilePicture", existingUser.profilePicture);
-          setProfilePic(existingUser.profilePicture);
-        }
+        console.log("User exists:", existingUser); 
+        
         setToken(existingUser.token);
         setUsername(emailPrefix);
         setUserId(existingUser.userId);
         setAuraPoints(existingUser.auraPoints);
         setEmail(existingUser.email);
 
+        if (existingUser.profilePicture) {
+          setProfilePic(existingUser.profilePicture);
+        } else {
+          setProfilePic('');
+        }
+
         navigate("/dashboard");
       } else {
         console.log("User does not exist, creating new user.");
-        // If user does not exist, create a new user
         const newUserResponse = await axios.post(
           "http://localhost:5000/api/auth/signup",
           {
             email: decoded.email,
             username: emailPrefix,
-            password: "google-auth", // No password for Google sign-in
+            password: "google-auth", 
           }
         );
 
         const newUser = newUserResponse.data;
-
-        localStorage.setItem("token", newUser.token);
-        localStorage.setItem("username", emailPrefix);
-        localStorage.setItem("userId", newUser.userId);
-        localStorage.setItem("email", newUser.email);
-        localStorage.setItem("auraPoints", 0);
-
-        if (existingUser.profilePicture) {
-          localStorage.setItem("profilePicture", existingUser.profilePicture);
-          setProfilePic(existingUser.profilePicture);
-        }
         setToken(newUser.token);
         setUsername(emailPrefix);
         setUserId(newUser.userId);
         setEmail(newUser.email);
         setAuraPoints(0);
+        if (newUser.profilePicture) {
+          setProfilePic(newUser.profilePicture);
+        } else {
+          setProfilePic('');
+        }
 
         navigate("/dashboard");
       }
@@ -195,16 +181,11 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar token={token} handleLogout={handleLogout} />
-
-      {/* Responsive Gradient Background Container */}
       <div className="flex flex-col md:flex-row flex-grow bg-gradient-to-br from-purple-600 via-purple-500 to-purple-300 mt-16">
-        {/* Left Section */}
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 md:p-10 text-white text-center">
           <h2 className="text-4xl md:text-6xl font-bold mb-4">Welcome Back!</h2>
           <p className="text-lg md:text-2xl">We're glad to see you again.</p>
         </div>
-
-        {/* Right Section */}
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 md:p-10">
           <div className="bg-white p-6 md:p-10 rounded-lg shadow-2xl w-full max-w-md">
             {isLoggedIn ? (

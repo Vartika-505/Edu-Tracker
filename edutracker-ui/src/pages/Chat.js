@@ -1,42 +1,54 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import io from "socket.io-client";
 import dayjs from "dayjs";
 import Navbar from "./Navbar";
+import { AuthContext } from "../context/AuthContext";
 
-const socket = io("http://localhost:5000");
-
-const Chat = ({ username }) => {
+const Chat = () => {
+  const [socket, setSocket] = useState(null);
   const [room, setRoom] = useState("general");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [file, setFile] = useState(null);
   const messagesEndRef = useRef(null);
 
+  const { username, userId } = useContext(AuthContext);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+ 
   useEffect(() => {
-    socket.emit("join_room", room);
+    if (!username) return;
 
-    socket.on("load_messages", (loadedMessages) => {
+    const newSocket = io("http://localhost:5000", {
+      query: { 
+        username: username,
+        userId: userId 
+      },
+    });
+
+    newSocket.emit("join_room", room);
+
+    newSocket.on("load_messages", (loadedMessages) => {
       setMessages(loadedMessages);
     });
 
-    socket.on("receive_message", (msg) => {
+    newSocket.on("receive_message", (msg) => {
       setMessages((prev) => [...prev, msg]);
     });
 
-    socket.on("delete_message", (msgId) => {
+    newSocket.on("delete_message", (msgId) => {
       setMessages((prev) => prev.filter((msg) => msg._id !== msgId));
     });
 
+    setSocket(newSocket);
+
     return () => {
-      socket.off("load_messages");
-      socket.off("receive_message");
-      socket.off("delete_message");
+      newSocket.disconnect();
     };
-  }, [room]);
+  }, [room, username, userId]); 
 
   useEffect(() => {
     scrollToBottom();
@@ -44,10 +56,12 @@ const Chat = ({ username }) => {
 
   const sendMessage = () => {
     if (!message.trim() && !file) return;
+    if (!username) return; 
 
     const msgData = {
       room,
-      username: username || "Anonymous", // Ensure username is never empty
+      username: username,
+      userId: userId, 
       text: message,
       timestamp: new Date(),
     };
@@ -60,17 +74,17 @@ const Chat = ({ username }) => {
           type: file.type,
           content: reader.result,
         };
-        socket.emit("send_message", msgData);
+        socket?.emit("send_message", msgData);
       };
       reader.readAsDataURL(file);
     } else {
-      socket.emit("send_message", msgData);
+      socket?.emit("send_message", msgData);
     }
 
     setMessage("");
     setFile(null);
   };
-  
+
   const handleDelete = async (msgId) => {
     try {
       await fetch(`http://localhost:5000/api/messages/${msgId}`, {
@@ -81,11 +95,27 @@ const Chat = ({ username }) => {
     }
   };
 
-  // Helper function to get a safe display name for avatars
   const getDisplayInitial = (name) => {
-    if (!name || name.length === 0) return "?";
-    return name[0].toUpperCase();
+    return name?.[0]?.toUpperCase() || "?";
   };
+
+  if (!username) {
+    return (
+      <>
+        <Navbar />
+        <div className="pt-[80px] h-screen bg-gradient-to-br from-gray-100 to-purple-50 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+              Please log in to access chat
+            </h2>
+            <p className="text-gray-500">
+              You need to be logged in to participate in the chat.
+            </p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -109,7 +139,9 @@ const Chat = ({ username }) => {
               <option value="doubts">❓ Doubts</option>
               <option value="fun">🎉 Fun</option>
             </select>
-            <span className="text-sm text-gray-600">Room: {room}</span>
+            <span className="text-sm text-gray-600">
+              Room: {room} | User: {username}
+            </span>
           </div>
 
           {/* Messages */}
@@ -119,9 +151,7 @@ const Chat = ({ username }) => {
               return (
                 <div
                   key={index}
-                  className={`mb-4 flex ${
-                    isMe ? "justify-end" : "justify-start"
-                  }`}
+                  className={`mb-4 flex ${isMe ? "justify-end" : "justify-start"}`}
                 >
                   {!isMe && (
                     <div className="w-8 h-8 rounded-full bg-purple-400 text-white flex items-center justify-center mr-2 text-sm">
