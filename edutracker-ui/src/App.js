@@ -102,7 +102,7 @@ export default function App() {
               />
               <Route 
                 path="/leaderboard" 
-                element={<Leaderboard username={username} />} 
+                element={<Leaderboard />} 
               />
               <Route 
                 path="/profile" 

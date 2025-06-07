@@ -1,51 +1,72 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Navbar from './Navbar';
+import { AuthContext } from '../context/AuthContext';
 
-const Leaderboard = ({ username }) => {
+const Leaderboard = () => {
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [userRank, setUserRank] = useState(null); // Store current user's rank
-    const [userPoints, setUserPoints] = useState(null); // Store current user's aura points
+    const [userRank, setUserRank] = useState(null);
+    const [userPoints, setUserPoints] = useState(null);
+
+    const { username, token, handleLogout } = useContext(AuthContext);
 
     useEffect(() => {
-        // Fetch leaderboard data from the backend
         const fetchLeaderboard = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/leaderboard');
-                setUsers(response.data); // Set the fetched users in the state
-
-                // Find the current user's rank and aura points
-                const loggedInUser = response.data.find(user => user.username === username);
-                if (loggedInUser) {
-                    setUserRank(response.data.indexOf(loggedInUser) + 1); // Rank is index + 1
-                    setUserPoints(loggedInUser.auraPoints); // Set user's aura points
+                setUsers(response.data);
+                if (username) {
+                    const loggedInUser = response.data.find(user => user.username === username);
+                    if (loggedInUser) {
+                        setUserRank(response.data.indexOf(loggedInUser) + 1);
+                        setUserPoints(loggedInUser.auraPoints);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching leaderboard data:', error);
             }
         };
 
-        fetchLeaderboard(); // Fetch leaderboard data
-    }, [username]); // Dependency on username to trigger the fetch when it changes
+        fetchLeaderboard();
+    }, [username]); 
 
-    // Filter users based on search term
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const fetchLeaderboard = async () => {
+                try {
+                    const response = await axios.get('http://localhost:5000/api/leaderboard');
+                    setUsers(response.data);
+
+                    if (username) {
+                        const loggedInUser = response.data.find(user => user.username === username);
+                        if (loggedInUser) {
+                            setUserRank(response.data.indexOf(loggedInUser) + 1);
+                            setUserPoints(loggedInUser.auraPoints);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching leaderboard data:', error);
+                }
+            };
+            fetchLeaderboard();
+        }, 30000); 
+
+        return () => clearInterval(interval); 
+    }, [username]);
+
     const filteredUsers = users.filter(user => {
         return (
-            user.username.toLowerCase().includes(searchTerm.toLowerCase()) || // Match username
-            user.auraPoints.toString().includes(searchTerm) // Match aura points
+            user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.auraPoints.toString().includes(searchTerm)
         );
     });
 
     return (
         <>
-            <Navbar />
-
-            {/* User Rank Box with Purple Background and Outline */}
-            {userRank && (
-                <div
-                    className="mt-[8vw] flex justify-center p-4 bg-purple-600 text-white rounded-lg w-full max-w-[400px] mx-auto border-4 border-purple-500"
-                >
+            <Navbar token={token} handleLogout={handleLogout} />
+            {userRank && username && (
+                <div className="mt-[8vw] flex justify-center p-4 bg-purple-600 text-white rounded-lg w-full max-w-[400px] mx-auto border-4 border-purple-500">
                     <div className="text-center">
                         <p className="text-lg font-semibold">Your Rank</p>
                         <p className="text-3xl font-bold">{userRank}</p>
@@ -54,7 +75,7 @@ const Leaderboard = ({ username }) => {
                 </div>
             )}
 
-            <div className="leaderboard p-6 mt-2"> {/* Added mt-20 to prevent overlap with navbar */}
+            <div className="leaderboard p-6 mt-2">
                 <h2 className="text-center text-2xl font-bold mb-4">Leaderboard</h2>
 
                 {/* Search Bar */}
@@ -63,12 +84,10 @@ const Leaderboard = ({ username }) => {
                         type="text"
                         placeholder="Search by username or aura points"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)} // Update search term
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="px-4 py-2 border rounded-lg w-full mt-[2vw]"
                     />
                 </div>
-
-                {/* Table */}
                 <table className="min-w-full bg-white border-collapse">
                     <thead>
                         <tr>
@@ -79,27 +98,20 @@ const Leaderboard = ({ username }) => {
                     </thead>
                     <tbody>
                         {filteredUsers.map((user, index) => {
-                            // Check if the user is the current user
                             const isCurrentUser = user.username === username;
 
                             return (
                                 <tr
                                     key={user._id}
-                                    className={`${isCurrentUser ? 'bg-purple-600 text-white' : ''}`} // Background color for current user's row
+                                    className={`${isCurrentUser ? 'bg-purple-600 text-white' : ''}`}
                                 >
-                                    <td
-                                        className={`px-6 py-4 whitespace-no-wrap border-b text-gray-700 ${isCurrentUser ? 'bg-purple-600 text-white' : ''}`} // Background color for rank
-                                    >
-                                        {index + 1} {/* Rank */}
+                                    <td className={`px-6 py-4 whitespace-no-wrap border-b text-gray-700 ${isCurrentUser ? 'bg-purple-600 text-white' : ''}`}>
+                                        {index + 1}
                                     </td>
-                                    <td
-                                        className={`px-6 py-4 whitespace-no-wrap border-b text-gray-700 ${isCurrentUser ? 'bg-purple-600 text-white' : ''}`} // Background color for username
-                                    >
+                                    <td className={`px-6 py-4 whitespace-no-wrap border-b text-gray-700 ${isCurrentUser ? 'bg-purple-600 text-white' : ''}`}>
                                         {user.username}
                                     </td>
-                                    <td
-                                        className={`px-6 py-4 whitespace-no-wrap border-b text-gray-700 ${isCurrentUser ? 'bg-purple-600 text-white' : ''}`} // Background color for aura points
-                                    >
+                                    <td className={`px-6 py-4 whitespace-no-wrap border-b text-gray-700 ${isCurrentUser ? 'bg-purple-600 text-white' : ''}`}>
                                         {user.auraPoints}
                                     </td>
                                 </tr>
