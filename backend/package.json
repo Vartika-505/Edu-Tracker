@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node index.js",
   "server": "nodemon index.js",
-  "client": "cd ../edutracker-ui && npm start",
-  "dev": "concurrently \"npm run server\" \"npm run client\""
+  "client": "cd ../edutracker-ui && npm start"
   },
   "author": "",
   "license": "ISC",
