@@ -59,11 +59,6 @@ const Navbar = () => {
                   </Link>
                 </li>
                 <li className="h-full">
-                  <Link to="/services" className={navLinkClass("/services")}>
-                    Services
-                  </Link>
-                </li>
-                <li className="h-full">
                   <Link to="/contact" className={navLinkClass("/contact")}>
                     Contact
                   </Link>
@@ -169,13 +164,6 @@ const Navbar = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link
-                      to="/services"
-                      className={navLinkClass("/services", true)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Services
-                    </Link>
                   </li>
                   <li>
                     <Link

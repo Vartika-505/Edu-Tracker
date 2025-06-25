@@ -23,7 +23,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        `${process.env.REACT_APP_API_URL}/api/auth/signup`,
         {
           username,
           email,
@@ -70,7 +70,7 @@ const handleGoogleSignIn = async (response) => {
 
   try {
     const googleSignInResponse = await axios.post(
-      "http://localhost:5000/api/auth/googleSign",
+      `${process.env.REACT_APP_API_URL}/api/auth/googleSign`,
       {
         googleId,
         username: googleDisplayName, 
@@ -97,7 +97,7 @@ const handleGoogleSignIn = async (response) => {
     } else {
       console.log("User does not exist, creating new user.");
       const newUserResponse = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        `${process.env.REACT_APP_API_URL}/api/auth/signup`,
         {
           email: decoded.email,
           username: googleDisplayName, 

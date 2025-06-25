@@ -34,7 +34,7 @@ const Login = () => {
 
       if (storedToken) {
         try {
-          await axios.get("http://localhost:5000/api/auth/validate-token", {
+          await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/validate-token`, {
             headers: { Authorization: `Bearer ${storedToken}` },
           });
           
@@ -61,7 +61,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${process.env.REACT_APP_API_URL}/api/auth/login`,
         {
           username: usernameInput,
           password,
@@ -123,7 +123,7 @@ const handleGoogleSignIn = async (response) => {
   
   try {
     const googleSignInResponse = await axios.post(
-      "http://localhost:5000/api/auth/googleSign",
+      `${process.env.REACT_APP_API_URL}/api/auth/googleSign`,
       {
         googleId,
         username: googleDisplayName, 
@@ -151,7 +151,7 @@ const handleGoogleSignIn = async (response) => {
     } else {
       console.log("User does not exist, creating new user.");
       const newUserResponse = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        `${process.env.REACT_APP_API_URL}/api/auth/signup`,
         {
           email: decoded.email,
           username: googleDisplayName, 

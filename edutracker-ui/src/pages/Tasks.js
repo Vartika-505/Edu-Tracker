@@ -22,7 +22,7 @@ const Tasks = () => {
                     const userId = localStorage.getItem('userId');
                     if (!userId) navigate('/login');
 
-                    const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`);
+                    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/${userId}`);
                     setTasks(response.data);
                 } catch (error) {
                     console.error("Error fetching tasks", error);
@@ -37,7 +37,7 @@ const Tasks = () => {
         if (!userId) return console.error("User ID not found");
         const newTask = { userId, name, category, deadline, difficultyLevel };
         try {
-            const response = await axios.post('http://localhost:5000/api/tasks', newTask);
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/tasks`, newTask);
             const addedTask = response.data;
             setTasks([...tasks, addedTask]);
             setName('');
@@ -52,7 +52,7 @@ const Tasks = () => {
     const completeTask = async (taskId, difficulty) => {
         try {
             const currentDate = new Date();
-            await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`, { completionDate: currentDate });
+            await axios.patch(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, { completionDate: currentDate });
             setTasks(tasks.map(task => (
                 task._id === taskId ? { ...task, completed: true, completionDate: currentDate } : task
             )));

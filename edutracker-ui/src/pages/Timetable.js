@@ -22,7 +22,7 @@ const Timetable = () => {
                 if (!userId) navigate('/login');
                 if (!token) return navigate('/home');
 
-                const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/${userId}`);
                 setTasks(response.data);
             } catch (error) {
                 console.error("Error fetching tasks", error);
@@ -77,7 +77,7 @@ const Timetable = () => {
     const handleMarkComplete = async (taskId) => {
         try {
             const currentDate = new Date();
-            const response = await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`, { completionDate: currentDate });
+            const response = await axios.patch(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, { completionDate: currentDate });
             
             if (response.status === 200) {
                 const newAuraPoints = auraPoints + 50;
@@ -86,7 +86,7 @@ const Timetable = () => {
                 setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
                 setFilteredTasks(filteredTasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
 
-                await axios.patch(`http://localhost:5000/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
+                await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
             }
         } catch (error) {
             console.error("Error completing task", error);

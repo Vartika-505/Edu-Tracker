@@ -15,7 +15,7 @@ const TaskManager = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`, {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setTasks(response.data);
@@ -34,7 +34,7 @@ const TaskManager = () => {
 
         const newTask = { userId, name, category, deadline, difficultyLevel };
         try {
-            const response = await axios.post('http://localhost:5000/api/tasks', newTask, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/tasks`, newTask, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTasks([...tasks, response.data]);
@@ -49,7 +49,7 @@ const TaskManager = () => {
 
     const completeTask = async (taskId, difficulty) => {
         try {
-            const response = await axios.patch(`http://localhost:5000/api/tasks/${taskId}/complete`, {}, {
+            const response = await axios.patch(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));

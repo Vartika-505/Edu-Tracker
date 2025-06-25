@@ -29,7 +29,7 @@ const Profile = () => {
                 navigate('/login');
                 return;
             }
-            const response = await fetch(`http://localhost:5000/api/tasks/summary/${userId}`);
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tasks/summary/${userId}`);
             if (!response.ok) throw new Error('Failed to fetch task summary');
             const data = await response.json();
             setTotalTasks(data.totalTasks);
@@ -55,7 +55,7 @@ const Profile = () => {
             const formData = new FormData();
             formData.append('profilePicture', file);
 
-            const response = await fetch(`http://localhost:5000/api/auth/uploadProfilePicture/${userId}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/uploadProfilePicture/${userId}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -81,7 +81,7 @@ const Profile = () => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:5000/api/auth/removeProfilePicture/${userId}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/removeProfilePicture/${userId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`,

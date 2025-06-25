@@ -14,7 +14,7 @@ const Leaderboard = () => {
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/leaderboard');
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/leaderboard`);
                 setUsers(response.data);
                 if (username) {
                     const loggedInUser = response.data.find(user => user.username === username);
@@ -35,7 +35,7 @@ const Leaderboard = () => {
         const interval = setInterval(() => {
             const fetchLeaderboard = async () => {
                 try {
-                    const response = await axios.get('http://localhost:5000/api/leaderboard');
+                    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/leaderboard`);
                     setUsers(response.data);
 
                     if (username) {

@@ -133,7 +133,7 @@ const Notes = ({ username }) => {
 
     const deleteNote = async (noteId) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/notes/${noteId}`, { method: 'DELETE' });
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/${noteId}`, { method: 'DELETE' });
             if (res.ok) {
                 setFilteredNotes(prev => prev.filter(n => n._id !== noteId));
                 setNotes(prev => prev.filter(n => n._id !== noteId));

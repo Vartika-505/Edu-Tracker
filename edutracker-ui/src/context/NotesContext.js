@@ -12,7 +12,7 @@ export const NotesProvider = ({ children }) => {
     const fetchNotes = async () => {
         if (userId) {
             try {
-                let url = `http://localhost:5000/api/notes?userId=${userId}`;
+                let url = `${process.env.REACT_APP_API_URL}/api/notes?userId=${userId}`;
                 if (selectedSubject) {
                     url += `&subject=${selectedSubject}`;
                 }
@@ -32,7 +32,7 @@ export const NotesProvider = ({ children }) => {
     // Create a new note
     const createNote = async (noteData) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/notes', noteData);
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/notes`, noteData);
             setNotes((prevNotes) => [...prevNotes, response.data]);
         } catch (error) {
             console.error('Error creating note:', error);
@@ -42,7 +42,7 @@ export const NotesProvider = ({ children }) => {
     // Update an existing note
     const updateNote = async (updatedNote) => {
         try {
-            const response = await axios.put(`http://localhost:5000/api/notes/${updatedNote._id}`, updatedNote);
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/notes/${updatedNote._id}`, updatedNote);
             setNotes((prevNotes) =>
                 prevNotes.map((note) =>
                     note._id === updatedNote._id ? response.data : note
