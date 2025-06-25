@@ -22,7 +22,7 @@ const Chat = () => {
   useEffect(() => {
     if (!username) return;
 
-    const newSocket = io("http://localhost:5000", {
+    const newSocket = io(`${process.env.REACT_APP_API_BASE_URL}`, {
       query: { 
         username: username,
         userId: userId 
@@ -87,7 +87,7 @@ const Chat = () => {
 
   const handleDelete = async (msgId) => {
     try {
-      await fetch(`http://localhost:5000/api/messages/${msgId}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/messages/${msgId}`, {
         method: "DELETE",
       });
     } catch (err) {

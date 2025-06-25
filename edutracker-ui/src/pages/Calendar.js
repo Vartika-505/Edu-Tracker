@@ -15,7 +15,7 @@ const Calendar = ({ token, username, setAuraPoints, handleLogout }) => {
                     console.log("User ID or Token missing");
                     return;
                 }
-                const response = await axios.get(`http://localhost:5000/api/tasks/${userId}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/tasks/${userId}`);
                 setTasks(response.data);
             } catch (error) {
                 console.error("Error fetching tasks", error);

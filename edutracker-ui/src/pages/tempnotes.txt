@@ -22,7 +22,7 @@ const Notes = ({ username }) => {
     // New delete functionality
     const deleteNote = async (noteId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/notes/${noteId}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/notes/${noteId}`, {
                 method: 'DELETE',
             });
             if (response.ok) {
