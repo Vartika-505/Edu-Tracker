@@ -22,7 +22,7 @@ const Chat = () => {
   useEffect(() => {
     if (!username) return;
 
-    const newSocket = io(`${process.env.REACT_APP_API_BASE_URL}`, {
+    const newSocket = io(`${process.env.REACT_APP_API_URL}`, {
       query: { 
         username: username,
         userId: userId 
