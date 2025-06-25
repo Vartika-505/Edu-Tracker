@@ -33,7 +33,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white fixed top-0 left-0 right-0 z-10 w-full px-6 py-4 shadow-md">
       <div className="flex justify-between items-center">
-        <img src={logo} alt="EduTracker Logo" width="100px" />
+        <img src={logo} alt="EduTracker Logo" width="200px" />
 
         {/* Mobile Menu Button */}
         <button
