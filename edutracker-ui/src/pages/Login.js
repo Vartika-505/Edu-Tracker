@@ -133,7 +133,7 @@ const handleGoogleSignIn = async (response) => {
 
     const existingUser = googleSignInResponse.data;
     if (existingUser) {
-      console.log("User exists:", existingUser); 
+      // console.log("User exists:", existingUser); 
       
       setToken(existingUser.token);
       setUsername(googleDisplayName); 

@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../images/logo.png";
-import Chat from "./Chat";
 import { Menu, X } from "lucide-react";
 
 const Navbar = () => {

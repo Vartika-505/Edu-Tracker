@@ -80,7 +80,7 @@ const handleGoogleSignIn = async (response) => {
 
     const existingUser = googleSignInResponse.data;
     if (existingUser) {
-      console.log("User exists:", existingUser);
+      // console.log("User exists:", existingUser);
       localStorage.setItem("token", existingUser.token);
       localStorage.setItem("username", googleDisplayName); 
       localStorage.setItem("userId", existingUser.userId);
