@@ -74,7 +74,7 @@ const Timetable = () => {
         setFilteredTasks(filtered);
     };
 
-    const handleMarkComplete = async (taskId) => {
+    const handleMarkComplete = async (taskId, difficulty) => {
         try {
             const currentDate = new Date();
             const response = await axios.patch(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, { completionDate: currentDate });
@@ -83,25 +83,12 @@ const Timetable = () => {
             if (!taskToComplete) return;
 
             const deadline = new Date(taskToComplete.deadline);
-            let points = 0;
-        switch (taskToComplete.difficultyLevel?.toLowerCase()) {
-            case 'easy':
-                points = 30;
-                break;
-            case 'medium':
-                points = 50;
-                break;
-            case 'hard':
-                points = 80;
-                break;
-            default:
-                points = 50; // fallback
-        }
+           
             
             if (response.status === 200) {
                 let newAuraPoints = auraPoints
                 if(currentDate<=deadline){
-                     newAuraPoints = auraPoints + points;
+                     newAuraPoints = auraPoints + difficulty;
                     setAuraPoints(newAuraPoints);
                     await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
                 }
@@ -185,7 +172,7 @@ const Timetable = () => {
                                         </button>
 
                                         <button
-                                            onClick={() => handleMarkComplete(task._id)}
+                                            onClick={() => handleMarkComplete(task._id, task.difficultyLevel)}
                                             disabled={task.completed}
                                             className={`py-2 px-4 rounded-lg font-semibold flex items-center space-x-2 ${task.completed ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-800'}`}
                                         >
