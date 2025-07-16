@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const Tasks = () => {
-    const { token, username, setAuraPoints, handleLogout } = useContext(AuthContext);
+    const { token, username, auraPoints, setAuraPoints, handleLogout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [tasks, setTasks] = useState([]);
     const [name, setName] = useState('');
