@@ -52,11 +52,17 @@ const Tasks = () => {
     const completeTask = async (taskId, difficulty) => {
         try {
             const currentDate = new Date();
+            const taskToComplete = tasks.find(task => task._id === taskId);
+        if (!taskToComplete) return console.error("Task not found");
+
+        const deadlineDate = new Date(taskToComplete.deadline);
             await axios.patch(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, { completionDate: currentDate });
             setTasks(tasks.map(task => (
                 task._id === taskId ? { ...task, completed: true, completionDate: currentDate } : task
             )));
-            setAuraPoints(prev => prev + difficulty);
+            
+            if (currentDate <= deadlineDate)
+                setAuraPoints(prev => prev + difficulty);
         } catch (error) {
             console.error("Error completing task", error);
         }
