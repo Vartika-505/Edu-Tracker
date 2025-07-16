@@ -61,8 +61,14 @@ const Tasks = () => {
                 task._id === taskId ? { ...task, completed: true, completionDate: currentDate } : task
             )));
             
-            if (currentDate <= deadlineDate)
-                setAuraPoints(prev => prev + difficulty);
+            if (currentDate <= deadlineDate){
+                const updatedPoints = auraPoints + difficulty;
+                setAuraPoints(updatedPoints);
+                const userId = localStorage.getItem('userId');
+                await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${userId}/auraPoints`, {
+                auraPoints: updatedPoints
+            });
+            }
         } catch (error) {
             console.error("Error completing task", error);
         }
