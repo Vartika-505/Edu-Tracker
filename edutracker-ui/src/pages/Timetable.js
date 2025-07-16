@@ -78,15 +78,38 @@ const Timetable = () => {
         try {
             const currentDate = new Date();
             const response = await axios.patch(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, { completionDate: currentDate });
+
+            const taskToComplete = tasks.find(task => task._id === taskId);
+            if (!taskToComplete) return;
+
+            const deadline = new Date(taskToComplete.deadline);
+            let points = 0;
+        switch (taskToComplete.difficultyLevel?.toLowerCase()) {
+            case 'easy':
+                points = 30;
+                break;
+            case 'medium':
+                points = 50;
+                break;
+            case 'hard':
+                points = 80;
+                break;
+            default:
+                points = 50; // fallback
+        }
             
             if (response.status === 200) {
-                const newAuraPoints = auraPoints + 50;
-                setAuraPoints(newAuraPoints);
+                let newAuraPoints = auraPoints
+                if(currentDate<=deadline){
+                     newAuraPoints = auraPoints + points;
+                    setAuraPoints(newAuraPoints);
+                    await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
+                }
                 
                 setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
                 setFilteredTasks(filteredTasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
 
-                await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
+                
             }
         } catch (error) {
             console.error("Error completing task", error);
