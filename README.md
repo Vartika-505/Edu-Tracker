@@ -8,6 +8,13 @@ It includes real-time chat, calendar integration, Google OAuth login, motivation
 
 ---
 
+## 🔗 Live Link
+
+🌐 **Check it out here:** [Live Link - Click Here]([https://your-live-link.com](https://edutrackernet.netlify.app/))
+
+
+---
+
 ## ✨ Features
 
 - ✅ **Task Management**
