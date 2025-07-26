@@ -86,17 +86,16 @@ const Timetable = () => {
            
             
             if (response.status === 200) {
-                let newAuraPoints = auraPoints
-                if(currentDate<=deadline){
-                     newAuraPoints = auraPoints + difficulty;
-                    setAuraPoints(newAuraPoints);
-                    await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
+                if (currentDate <= deadline) {
+                    setAuraPoints(response.data.auraPoints);
                 }
-                
-                setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
-                setFilteredTasks(filteredTasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
 
-                
+                setTasks(tasks.map(task => (
+                    task._id === taskId ? { ...task, completed: true } : task
+                )));
+                setFilteredTasks(filteredTasks.map(task => (
+                    task._id === taskId ? { ...task, completed: true } : task
+                )));
             }
         } catch (error) {
             console.error("Error completing task", error);

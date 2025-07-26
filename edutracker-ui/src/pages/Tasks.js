@@ -50,29 +50,23 @@ const Tasks = () => {
     };
 
     const completeTask = async (taskId, difficulty) => {
-        try {
-            const currentDate = new Date();
-            const taskToComplete = tasks.find(task => task._id === taskId);
-        if (!taskToComplete) return console.error("Task not found");
+  try {
+    const response = await axios.patch(
+      `${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-        const deadlineDate = new Date(taskToComplete.deadline);
-            await axios.patch(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, { completionDate: currentDate });
-            setTasks(tasks.map(task => (
-                task._id === taskId ? { ...task, completed: true, completionDate: currentDate } : task
-            )));
-            
-            if (currentDate <= deadlineDate){
-                const updatedPoints = auraPoints + difficulty;
-                setAuraPoints(updatedPoints);
-                const userId = localStorage.getItem('userId');
-                await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${userId}/auraPoints`, {
-                auraPoints: updatedPoints
-            });
-            }
-        } catch (error) {
-            console.error("Error completing task", error);
-        }
-    };
+    setTasks(tasks.map(task => (
+      task._id === taskId ? { ...task, completed: true } : task
+    )));
+
+    setAuraPoints(response.data.auraPoints);
+
+  } catch (error) {
+    console.error('Error completing task', error);
+  }
+};
 
     const formatDeadline = (date) => {
         const d = new Date(date);
