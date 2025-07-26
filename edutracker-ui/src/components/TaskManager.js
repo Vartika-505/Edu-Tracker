@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { AuthContext } from '../context/AuthContext'; // Import the AuthContext
+import { AuthContext } from '../context/AuthContext'; 
 
 const TaskManager = () => {
     const [tasks, setTasks] = useState([]);
@@ -8,8 +8,6 @@ const TaskManager = () => {
     const [category, setCategory] = useState('Lecture Attendance');
     const [deadline, setDeadline] = useState('');
     const [difficultyLevel, setDifficultyLevel] = useState(50);
-
-    // Access user data and auraPoints from AuthContext
     const { token, userId, auraPoints, setAuraPoints } = useContext(AuthContext);
 
     useEffect(() => {
@@ -53,7 +51,7 @@ const TaskManager = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
-            setAuraPoints(prev => prev + difficulty); // Update aura points using context
+            setAuraPoints(prev => prev + difficulty); 
         } catch (error) {
             console.error('Error completing task', error);
         }

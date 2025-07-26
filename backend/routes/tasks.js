@@ -3,16 +3,10 @@ import Task from '../models/Task.js';
 import User from '../models/User.js';
 
 const router = express.Router();
-
-// Route to get task summary for a user
 router.get('/summary/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-
-    // Get the total number of tasks for the user
     const totalTasks = await Task.countDocuments({ userId });
-
-    // Get the number of completed tasks for the user
     const completedTasks = await Task.countDocuments({ userId, completed: true });
 
     res.json({ totalTasks, completedTasks });
@@ -21,7 +15,6 @@ router.get('/summary/:userId', async (req, res) => {
   }
 });
 
-// Get tasks by user ID
 router.get('/:userId', async (req, res) => {
   try {
     const tasks = await Task.find({ userId: req.params.userId });
@@ -31,7 +24,7 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
-// Add a new task
+
 router.post('/', async (req, res) => {
   const { userId, name, category, deadline, difficultyLevel } = req.body;
   try {
@@ -43,7 +36,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Mark task as complete and update user aura points
 router.patch('/:taskId/complete', async (req, res) => {
   const { taskId } = req.params;
   console.log(taskId);

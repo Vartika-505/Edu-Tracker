@@ -8,7 +8,6 @@ export const NotesProvider = ({ children }) => {
     const [userId, setUserId] = useState(localStorage.getItem('userId'));
     const [selectedSubject, setSelectedSubject] = useState(localStorage.getItem('selectedSubject') || '');
 
-    // Fetch notes based on userId and selectedSubject
     const fetchNotes = async () => {
         if (userId) {
             try {
@@ -24,12 +23,11 @@ export const NotesProvider = ({ children }) => {
         }
     };
 
-    // Fetch notes when userId or selectedSubject changes
+    
     useEffect(() => {
         fetchNotes();
     }, [userId, selectedSubject]);
 
-    // Create a new note
     const createNote = async (noteData) => {
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/notes`, noteData);
@@ -38,8 +36,6 @@ export const NotesProvider = ({ children }) => {
             console.error('Error creating note:', error);
         }
     };
-
-    // Update an existing note
     const updateNote = async (updatedNote) => {
         try {
             const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/notes/${updatedNote._id}`, updatedNote);
@@ -68,7 +64,6 @@ export const NotesProvider = ({ children }) => {
     );
 };
 
-// Custom hook to use the NotesContext
 export const useNotes = () => {
     return useContext(NotesContext);
 };

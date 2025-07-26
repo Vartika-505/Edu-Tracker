@@ -2,8 +2,6 @@ import express from 'express';
 import Note from '../models/Note.js';
 
 const router = express.Router();
-
-// GET all notes for a user with optional subject filter
 router.get('/', async (req, res) => {
     try {
         const { userId, subject } = req.query;
@@ -33,7 +31,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST a new note
+
 router.post('/', async (req, res) => {
     try {
         const { title, content, tags, userId, subject } = req.body;
@@ -43,13 +41,13 @@ router.post('/', async (req, res) => {
 
         const newNote = new Note({ title, content, tags, userId, subject });
         const savedNote = await newNote.save();
-        res.status(201).json(savedNote);  // Return saved note
+        res.status(201).json(savedNote);  
     } catch (error) {
         res.status(500).json({ message: 'Error creating note', error: error.message });
     }
 });
 
-// GET note content by ID
+
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -59,13 +57,12 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Note not found' });
         }
 
-        res.status(200).json(note.content);  // Return note content
+        res.status(200).json(note.content);  
     } catch (error) {
         res.status(500).json({ message: 'Error fetching note content', error: error.message });
     }
 });
 
-// PUT (update) a note by ID
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -85,13 +82,13 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Note not found' });
         }
 
-        res.status(200).json(updatedNote);  // Return updated note
+        res.status(200).json(updatedNote); 
     } catch (error) {
         res.status(500).json({ message: 'Error updating note', error: error.message });
     }
 });
 
-// DELETE a note by ID
+
 router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -107,14 +104,13 @@ router.delete('/:id', async (req, res) => {
     }
 });
 export const getUserUniqueSubjects = async (req, res) => {
-    const userId = req.user._id; // Assuming `req.user._id` is populated by authentication middleware (like JWT or session)
+    const userId = req.user._id; 
 
     if (!userId) {
         return res.status(400).json({ error: 'User is not authenticated' });
     }
 
     try {
-        // Use the MongoDB `distinct` method to get unique subjects for the logged-in user
         const subjects = await Note.find({ userId }).distinct('subject');
         res.status(200).json(subjects);
     } catch (error) {
