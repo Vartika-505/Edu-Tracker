@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const Tasks = () => {
-    const { token, username, setAuraPoints, handleLogout } = useContext(AuthContext);
+    const { token, username, auraPoints, setAuraPoints, handleLogout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [tasks, setTasks] = useState([]);
     const [name, setName] = useState('');
@@ -52,11 +52,23 @@ const Tasks = () => {
     const completeTask = async (taskId, difficulty) => {
         try {
             const currentDate = new Date();
+            const taskToComplete = tasks.find(task => task._id === taskId);
+        if (!taskToComplete) return console.error("Task not found");
+
+        const deadlineDate = new Date(taskToComplete.deadline);
             await axios.patch(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, { completionDate: currentDate });
             setTasks(tasks.map(task => (
                 task._id === taskId ? { ...task, completed: true, completionDate: currentDate } : task
             )));
-            setAuraPoints(prev => prev + difficulty);
+            
+            if (currentDate <= deadlineDate){
+                const updatedPoints = auraPoints + difficulty;
+                setAuraPoints(updatedPoints);
+                const userId = localStorage.getItem('userId');
+                await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${userId}/auraPoints`, {
+                auraPoints: updatedPoints
+            });
+            }
         } catch (error) {
             console.error("Error completing task", error);
         }

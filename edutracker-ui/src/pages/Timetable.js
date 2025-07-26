@@ -74,19 +74,29 @@ const Timetable = () => {
         setFilteredTasks(filtered);
     };
 
-    const handleMarkComplete = async (taskId) => {
+    const handleMarkComplete = async (taskId, difficulty) => {
         try {
             const currentDate = new Date();
             const response = await axios.patch(`${process.env.REACT_APP_API_URL}/api/tasks/${taskId}/complete`, { completionDate: currentDate });
+
+            const taskToComplete = tasks.find(task => task._id === taskId);
+            if (!taskToComplete) return;
+
+            const deadline = new Date(taskToComplete.deadline);
+           
             
             if (response.status === 200) {
-                const newAuraPoints = auraPoints + 50;
-                setAuraPoints(newAuraPoints);
+                let newAuraPoints = auraPoints
+                if(currentDate<=deadline){
+                     newAuraPoints = auraPoints + difficulty;
+                    setAuraPoints(newAuraPoints);
+                    await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
+                }
                 
                 setTasks(tasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
                 setFilteredTasks(filteredTasks.map(task => (task._id === taskId ? { ...task, completed: true } : task)));
 
-                await axios.patch(`${process.env.REACT_APP_API_URL}/api/users/${localStorage.getItem('userId')}/auraPoints`, { auraPoints: newAuraPoints });
+                
             }
         } catch (error) {
             console.error("Error completing task", error);
@@ -162,7 +172,7 @@ const Timetable = () => {
                                         </button>
 
                                         <button
-                                            onClick={() => handleMarkComplete(task._id)}
+                                            onClick={() => handleMarkComplete(task._id, task.difficultyLevel)}
                                             disabled={task.completed}
                                             className={`py-2 px-4 rounded-lg font-semibold flex items-center space-x-2 ${task.completed ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-800'}`}
                                         >
